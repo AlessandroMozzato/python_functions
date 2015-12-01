@@ -16,7 +16,8 @@ from topostrophy import *
 
 class StateRead:
     def __init__(self):
-        self.data = {'T' : [], 'V' : [], 'U' : [] , 'S' : [], 'days' : [], 'years' : []}
+        self.data = {'T' : [], 'V' : [], 'U' : [] , 'S' : [], 'Eta' : [] , 'days' : [], 'years' : []}
+        self.mean = {}
         self.psi = []
         self.psi_mean = []
         self.psi_max = []
@@ -28,6 +29,8 @@ class StateRead:
         self.hfacc = []
         self.hfacs = []
         self.hfacw = []
+        self.lon = []
+        self.lat = []
 
     def readData(self,path,list_var):
         self.path = path
@@ -40,6 +43,8 @@ class StateRead:
         self.data['U']=U[list_var]*1
         S=file2read.variables['S']
         self.data['S']=S[list_var]*1
+        Eta=file2read.variables['Eta']
+        self.data['Eta']=Eta[list_var]*1
         days=file2read.variables['T']
         self.data['days']=days[list_var]*1
         self.years = (self.data['days'] - self.data['days'][0])/(60*60*24*360)
@@ -62,10 +67,25 @@ class StateRead:
         self.hfacw = hfacw[:]*1
         hfacs = file2read.variables['HFacS']
         self.hfacs = hfacs[:]*1
+        lat = file2read.variables['YC']
+        self.lat = lat[:]*1        
+        lon = file2read.variables['XC']
+        self.lon = lon[:]*1
+        
         self.data['T'][:,self.hfacc==0] = np.nan
         self.data['U'][:,self.hfacw==0] = np.nan
         self.data['V'][:,self.hfacs==0] = np.nan
         self.data['S'][:,self.hfacc==0] = np.nan
+        self.data['Eta'][:,self.hfacc[0,:,:]==0] = np.nan
+
+    def getMeans(self,list_iter,list_var):
+        file2read = netcdf.NetCDFFile(self.path+'state.nc','r')
+        for var in list_var:
+            self.mean[var] = np.ndarray(self.hfacc.shape)
+        for i in list_iter:
+            for var in list_var:
+                tmp = file2read.variables[var]
+                self.mean[var] = self.mean[var] + tmp[i,:,:,:]*float(1)/float(len(list_iter))
 
     def fluxCalc(self):
             # This function calculates 

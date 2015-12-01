@@ -6,3 +6,5 @@ from monitorclass import *
 from stateclass import *
 from heatbalance import *
 from plotting_function import *
+from noaa import *
+from nemo import *
