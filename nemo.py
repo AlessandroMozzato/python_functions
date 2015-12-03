@@ -15,18 +15,22 @@ class nemo:
         self.S = []
         self.depth = []
         self.mask = []
-        
+        self.title = []
+        self.ice = []
+
     def read_nemo(self,res):
         if res == '83':
             xdim = 3059
             ydim = 4322
             zdim = 75
             ycut = 2000
+            self.title = 'Nemo 1/12'
         elif res == '25':
             xdim = 1021
             ydim = 1442
             zdim = 64
-            ycut = 2000
+            ycut = 700
+            self.title = 'Nemo 1/4'
 
         path = '/scratch/general/am8e13/NEMO_data/'
         mask_nemo = komod.mitbin(path+'NEMO'+res+'_mask',xdim=xdim,ydim=ydim,zdim=zdim,datatype='float32')
@@ -35,6 +39,7 @@ class nemo:
         depth_nemo = komod.mitbin(path+'NEMO'+res+'_depth',xdim=1,ydim=1,zdim=zdim,datatype='float32')
         T_nemo = komod.mitbin(path+'NEMO'+res+'_temp',xdim=xdim,ydim=ydim,zdim=zdim,datatype='float32')
         S_nemo = komod.mitbin(path+'NEMO'+res+'_salt',xdim=xdim,ydim=ydim,zdim=zdim,datatype='float32')
+        ice_nemo = komod.mitbin(path+'NEMO'+res+'_ice',xdim=xdim,ydim=ydim,datatype='float32')
 
         T_nemo[mask_nemo == 0] = np.nan
         T_nemo = T_nemo.squeeze(axis=0)
@@ -43,6 +48,11 @@ class nemo:
         S_nemo[mask_nemo == 0] = np.nan
         S_nemo = S_nemo.squeeze(axis=0)
         S_nemo = S_nemo[:,ycut:,:]
+
+        ice_nemo[0,0,mask_nemo[0,0,:,:]==0] = np.nan
+        ice_nemo = ice_nemo.squeeze(axis=0)
+        ice_nemo = ice_nemo.squeeze(axis=0)
+        ice_nemo = ice_nemo[ycut:,:]
 
         lat_nemo = lat_nemo.squeeze(axis=0)
         lat_nemo = lat_nemo.squeeze(axis=0)
@@ -55,5 +65,9 @@ class nemo:
         self.lon = lon_nemo
         self.T = T_nemo
         self.S = S_nemo
-        self.depth = depth_nemo
         self.mask = mask_nemo
+        self.ice = ice_nemo
+
+        self.depth = np.zeros(zdim)
+        for j in range(zdim):
+            self.depth[j] = -depth_nemo[0,j,0,0]

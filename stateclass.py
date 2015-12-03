@@ -31,6 +31,7 @@ class StateRead:
         self.hfacw = []
         self.lon = []
         self.lat = []
+        self.depth = []
 
     def readData(self,path,list_var):
         self.path = path
@@ -48,7 +49,8 @@ class StateRead:
         days=file2read.variables['T']
         self.data['days']=days[list_var]*1
         self.years = (self.data['days'] - self.data['days'][0])/(60*60*24*360)
-                                                                                    
+        file2read.close()
+
         if self.data['T'].shape[3] == 210:
             self.grid = "/scratch/general/am8e13/results36km/grid.nc"
             self.res = 36
@@ -71,6 +73,9 @@ class StateRead:
         self.lat = lat[:]*1        
         lon = file2read.variables['XC']
         self.lon = lon[:]*1
+        depth = file2read.variables['Z']
+        self.depth = depth[:]*1
+        file2read.close()
         
         self.data['T'][:,self.hfacc==0] = np.nan
         self.data['U'][:,self.hfacw==0] = np.nan
@@ -86,6 +91,7 @@ class StateRead:
             for var in list_var:
                 tmp = file2read.variables[var]
                 self.mean[var] = self.mean[var] + tmp[i,:,:,:]*float(1)/float(len(list_iter))
+        file2read.close()
 
     def fluxCalc(self):
             # This function calculates 

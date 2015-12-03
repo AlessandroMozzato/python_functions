@@ -12,7 +12,8 @@ class noaa:
         self.T = []
         self.S =[]
         self.depth = []
-    
+        self.title = 'Noaa data'
+
     def read_noaa(self):
         file2read = netcdf.NetCDFFile("/scratch/general/am8e13/noaa_climatology/s00_04.nc",'r')
         s_an=file2read.variables['s_an']
@@ -26,6 +27,7 @@ class noaa:
         lat=lat[:]*1
         depth=file2read.variables['depth']
         depth=depth[:]*1
+        file2read.close()
         
         # We interpolate the data for the new resolution
         file2read = netcdf.NetCDFFile("/scratch/general/am8e13/results18km/grid.nc",'r')
@@ -33,7 +35,8 @@ class noaa:
         XC_18km = XC_18km[:]*1
         YC_18km = file2read.variables['YC']
         YC_18km = YC_18km[:]*1
-        
+        file2read.close()
+
         T_noaa = np.zeros((102, 384, 420))
         S_noaa = np.zeros((102, 384, 420))
         # looping in the vertical coordinate
@@ -46,8 +49,8 @@ class noaa:
         T_noaa[T_noaa > 100] = np.nan
         S_noaa[S_noaa > 100] = np.nan
         
-        self.lat = lat
-        self.lon = lon
+        self.lat = YC_18km
+        self.lon = XC_18km
         self.T = T_noaa
         self.S = S_noaa
-        self.depth = depth
+        self.depth = -depth
