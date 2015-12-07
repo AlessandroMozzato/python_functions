@@ -26,29 +26,39 @@ class Woa:
     def __init__(self):
         self.lat = run36.lat
         self.lon = run36.lon
+        file2read = netcdf.NetCDFFile("/scratch/general/am8e13/results36km/grid.nc",'r')
+        bathy = file2read.variables['HFacC']
+        bathy = grid[:]*1
+        Z = file2read.variables['Z']
+        Z = Z[:]*1
         file1 = '/hpcdata/scratch/am8e13/cs_36km_tutorial/run_input/WOA05_THETA_JAN_210x192x50_arctic'
         self.T = komod.mitbin(file1,xdim=192,ydim=210,zdim=50,datatype='float32')
         self.T = np.squeeze(self.T,axis=0)
-        self.T[run36.bathy == 0] = np.nan
+        self.T[bathy == 0] = np.nan
         file1 = '/hpcdata/scratch/am8e13/cs_36km_tutorial/run_input/WOA05_SALT_JAN_210x192x50_arctic'
         self.S = komod.mitbin(file1,xdim=192,ydim=210,zdim=50,datatype='float32')
         self.S = np.squeeze(self.S,axis=0)
-        self.S[run36.bathy == 0] = np.nan
-        self.depth = run36.depth
+        self.S[bathy == 0] = np.nan
+        self.depth = Z
         self.title = 'Woa'
 
 class Phc:
     def __init__(self):
         self.lat = run36.lat
         self.lon = run36.lon
+        file2read = netcdf.NetCDFFile("/scratch/general/am8e13/results36km/grid.nc",'r')
+        bathy = file2read.variables['HFacC']
+        bathy = grid[:]*1
+        Z = file2read.variables['Z']
+        Z = Z[:]*1
         file1 = '/hpcdata/scratch/am8e13/cs_36km_tutorial/run_input/theta.phc_210_192_50_12'
         self.T = komod.mitbin(file1,xdim=192,ydim=210,zdim=50,datatype='float32')
         self.T = np.squeeze(self.T,axis=0)
-        self.T[run36.bathy == 0] = np.nan
+        self.T[bathy == 0] = np.nan
         file1 = '/hpcdata/scratch/am8e13/cs_36km_tutorial/run_input/salt.phc_210_192_50_12'
         self.S = komod.mitbin(file1,xdim=192,ydim=210,zdim=50,datatype='float32')
         self.S = np.squeeze(self.S,axis=0)
-        self.S[run36.bathy == 0] = np.nan
-        self.depth = run36.depth
+        self.S[bathy == 0] = np.nan
+        self.depth = Z
         self.title = 'PHC'
 
