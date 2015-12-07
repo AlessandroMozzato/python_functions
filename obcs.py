@@ -36,7 +36,8 @@ class Obcs:
                      'Eu' : [] , 'Wu' : [] , 'Nu' : [] , \
                      'Et' : [] , 'Wt' : [] , 'Nt' : [] , \
                      'Es' : [] , 'Ws' : [] , 'Ns' : [] }
-        
+        self.title = 'OBCS'
+
     def ReadData(self,path,tdim,endingstr,res):
         obcs_data = ['Ev' , 'Wv' , 'Nv' , 'Eu' , 'Wu' , 'Nu' , 'Et' , 'Wt' , 'Nt' , 'Es' , 'Ws' , 'Ns' ]
         
