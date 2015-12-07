@@ -11,4 +11,3 @@ from nemo import *
 from spinup import *
 from plottransect import *
 from readInitCond import *
-from obcs import *
