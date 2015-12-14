@@ -12,3 +12,4 @@ from spinup import *
 from plottransect import *
 from readInitCond import *
 from obcs import *
+from plot_obcs import *

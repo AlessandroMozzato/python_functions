@@ -33,7 +33,7 @@ class StateRead:
         self.lat = []
         self.depth = []
         self.totalFluxes = {}
-
+        
     def readData(self,path,list_var):
         self.path = path
         file2read = netcdf.NetCDFFile(path+'state.nc','r')
@@ -83,6 +83,9 @@ class StateRead:
         self.data['V'][:,self.hfacs==0] = np.nan
         self.data['S'][:,self.hfacc==0] = np.nan
         self.data['Eta'][:,self.hfacc[0,:,:]==0] = np.nan
+        
+        self.T = np.nanmean(self.data['T'],axis=0)
+        self.S = np.nanmean(self.data['S'],axis=0)
 
     def getMeans(self,list_iter,list_var):
         file2read = netcdf.NetCDFFile(self.path+'state.nc','r')

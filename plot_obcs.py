@@ -29,13 +29,13 @@ def plot_obcs(data1,data2,data3,data4,data5,loc,var,vmin,vmax,row=1,col=5):
     if var == 'S':
         if loc == 'N':
             field1 = np.array(data1.S[:,191,:])
-            field2 = np.array(data2.S[:,191*2,:])
+            field2 = np.array(data2.S[:,191,:])
             field3 = np.array(data3.S[:,191,:])
             field4 = np.array(data4.S[:,191,:])
             field5 = np.array(data5.S[:,191,:])
         elif loc == 'E':
             field1 = np.array(data1.S[:,:,209])
-            field2 = np.array(data2.S[:,:,209*2])
+            field2 = np.array(data2.S[:,:,209])
             field3 = np.array(data3.S[:,:,209])
             field4 = np.array(data4.S[:,:,209])
             field5 = np.array(data5.S[:,:,209])
@@ -48,13 +48,13 @@ def plot_obcs(data1,data2,data3,data4,data5,loc,var,vmin,vmax,row=1,col=5):
     elif var == 'T':
         if loc == 'N':
             field1 = np.array(data1.T[:,191,:])
-            field2 = np.array(data2.T[:,191*2,:])
+            field2 = np.array(data2.T[:,191,:])
             field3 = np.array(data3.T[:,191,:])
             field4 = np.array(data4.T[:,191,:])
             field5 = np.array(data5.T[:,191,:])
         elif loc == 'E':
             field1 = np.array(data1.T[:,:,209])
-            field2 = np.array(data2.T[:,:,209*2])
+            field2 = np.array(data2.T[:,:,209])
             field3 = np.array(data3.T[:,:,209])
             field4 = np.array(data4.T[:,:,209])
             field5 = np.array(data5.T[:,:,209])

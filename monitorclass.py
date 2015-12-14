@@ -47,6 +47,7 @@ def monitor_extract(x,iter_list):
     seaice_heff_min_tot = []
     seaice_heff_mean_tot = []
     time_seconds_tot = []
+    time_seconds_ice_tot = []
     
     for iter in iter_list:
         zerosto_add = '0'
@@ -105,7 +106,11 @@ def monitor_extract(x,iter_list):
         ke_max=file2read.variables['ke_max']
         ke_max=ke_max[:]*1
         ke_vol=file2read.variables['ke_vol']
-        ke_vol=ke_vol[:]*1    
+        ke_vol=ke_vol[:]*1
+        
+        # Reading Seaice
+        time_seconds_ice = file2read3.variables['seaice_time_sec']
+        time_seconds_ice =time_seconds_ice[:]*1            
         seaice_area_max = file2read3.variables['seaice_area_max']
         seaice_area_max = seaice_area_max[:]*1
         seaice_area_min = file2read3.variables['seaice_area_min']
@@ -118,11 +123,12 @@ def monitor_extract(x,iter_list):
         seaice_heff_min = seaice_heff_min[:]*1
         seaice_heff_mean = file2read3.variables['seaice_heff_mean']
         seaice_heff_mean = seaice_heff_mean[:]*1
-    
-        seaice_area_max_tot =np.concatenate([seaice_area_max_tot , seaice_area_max])
+        
+        time_seconds_ice_tot = np.concatenate([time_seconds_ice_tot , time_seconds_ice])
+        seaice_area_max_tot = np.concatenate([seaice_area_max_tot , seaice_area_max])
         seaice_area_min_tot = np.concatenate([seaice_area_min_tot , seaice_area_min])
-        seaice_area_mean_tot =np.concatenate([seaice_area_mean_tot , seaice_area_mean])    
-        seaice_heff_max_tot =np.concatenate([seaice_heff_max_tot , seaice_heff_max])
+        seaice_area_mean_tot = np.concatenate([seaice_area_mean_tot , seaice_area_mean])    
+        seaice_heff_max_tot = np.concatenate([seaice_heff_max_tot , seaice_heff_max])
         seaice_heff_min_tot = np.concatenate([seaice_heff_min_tot , seaice_heff_min])
         seaice_heff_mean_tot =np.concatenate([seaice_heff_mean_tot , seaice_heff_mean])        
         time_seconds_tot =np.concatenate([time_seconds_tot , time_seconds])
@@ -165,7 +171,7 @@ def monitor_extract(x,iter_list):
                 sst_mean_tot, sst_max_tot, sst_min_tot, vvel_mean_tot, vvel_max_tot, vvel_min_tot, \
                 uvel_mean_tot, uvel_max_tot, uvel_min_tot, ke_mean_tot, ke_max_tot, ke_vol_tot, \
                 seaice_area_max_tot, seaice_area_min_tot, seaice_area_mean_tot, seaice_heff_max_tot, \
-                seaice_heff_min_tot, seaice_heff_mean_tot, time_seconds_tot
+                seaice_heff_min_tot, seaice_heff_mean_tot, time_seconds_tot, time_seconds_ice_tot
 
 
 def dynStDiag_extract(x,iter_list):
@@ -283,8 +289,8 @@ def titles():
             'ke_max' : 'm^2/s^2', 'ke_vol' : 'm^2/s^2', 'seaice_area_max' : '%', \
             'seaice_area_min' : '%', 'seaice_area_mean' : '%', \
             'seaice_heff_max' : 'm', 'seaice_heff_min' : 'm', \
-            'seaice_heff_mean' : 'm', 'time_seconds' : 's' , \
-          'time_years' : 'Years'} 
+            'seaice_heff_mean' : 'm', 'time_seconds' : 's' , 'time_seconds_ice' : 's', 'time_years' : 'Years',\
+          'time_years_ice' : 'Years'} 
     time = {'theta_mean' : 'time_years', 'theta_min' : 'time_years', 'theta_max' :  'time_years', \
         'eta_mean' : 'time_years', 'eta_max' : 'time_years', 'eta_min' : 'time_years', \
         'salt_mean' : 'time_years' , 'salt_max' : 'time_years' , 'salt_min' : 'time_years' , \
@@ -306,7 +312,8 @@ class MonitorRead():
                      'vvel_mean' : [], 'vvel_max' : [], 'vvel_min' : [], 'uvel_mean' : [], 'uvel_max' : [], \
                      'uvel_min' : [], 'ke_mean' : [], 'ke_max' : [], 'ke_vol' : [], 'seaice_area_max' : [], \
                      'seaice_area_min' : [], 'seaice_area_mean' : [], 'seaice_heff_max' : [], 'seaice_heff_min' : [], \
-                     'seaice_heff_mean' : [], 'time_seconds' : [] , 'time_years' : [] }
+                     'seaice_heff_mean' : [], 'time_seconds' : [] , 'time_years' : [] , 'time_seconds_ice' : [],\
+                     'time_years_ice' : []}
         self.dataDyn =  {'theta_lv_mean' : [], 'theta_lv_min' : [], 'theta_lv_max' : [] , \
                          'salt_lv_mean' : [] , 'salt_lv_max' : [] , 'salt_lv_min' : [] , \
                          'vvel_lv_mean' : [], 'vvel_lv_max' : [], 'vvel_lv_min' : [], \
@@ -323,9 +330,10 @@ class MonitorRead():
         self.data['uvel_min'], self.data['ke_mean'], self.data['ke_max'], self.data['ke_vol'], \
         self.data['seaice_area_max'], self.data['seaice_area_min'], self.data['seaice_area_mean'], \
         self.data['seaice_heff_max'], self.data['seaice_heff_min'], self.data['seaice_heff_mean'], \
-        self.data['time_seconds'] = monitor_extract(path,iters)
+        self.data['time_seconds'], self.data['time_seconds_ice'] = monitor_extract(path,iters)
         self.data['time_years'] = (self.data['time_seconds']- self.data['time_seconds'][0])/(360*60*60*24)
-    
+        self.data['time_years_ice'] = (self.data['time_seconds_ice']- self.data['time_seconds_ice'][0])/(360*60*60*24)
+        
     def readDynStDiag(self,path,iters):
         self.dataDyn['theta_lv_mean'], self.dataDyn['theta_lv_max'], self.dataDyn['theta_lv_min'], \
         self.dataDyn['salt_lv_mean'], self.dataDyn['salt_lv_max'], self.dataDyn['salt_lv_min'], \
@@ -338,4 +346,3 @@ class MonitorRead():
     def title(self,title,color):
         self.title = title
         self.color = color
-

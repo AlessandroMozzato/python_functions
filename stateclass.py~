@@ -32,6 +32,7 @@ class StateRead:
         self.lon = []
         self.lat = []
         self.depth = []
+        self.totalFluxes = {}
 
     def readData(self,path,list_var):
         self.path = path
