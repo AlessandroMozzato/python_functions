@@ -25,18 +25,21 @@ class StateRead:
         self.years = []
         self.res = []
         self.grid = []
-        self.path = []
         self.hfacc = []
         self.hfacs = []
         self.hfacw = []
         self.lon = []
         self.lat = []
         self.depth = []
+        self.X = []
+        self.Y = []
         self.totalFluxes = {}
         
-    def readData(self,path,list_var):
+    def getPath(self,path):
         self.path = path
-        file2read = netcdf.NetCDFFile(path+'state.nc','r')
+
+    def readData(self,list_var):
+        file2read = netcdf.NetCDFFile(self.path+'state.nc','r')
         Temp=file2read.variables['Temp']
         self.data['T']=Temp[list_var]*1
         V=file2read.variables['V']
@@ -76,6 +79,10 @@ class StateRead:
         self.lon = lon[:]*1
         depth = file2read.variables['Z']
         self.depth = depth[:]*1
+        X = file2read.variables['X']
+        self.X = X[:]*1
+        Y = file2read.variables['Y']
+        self.Y = Y[:]*1
         file2read.close()
         
         self.data['T'][:,self.hfacc==0] = np.nan
@@ -86,6 +93,12 @@ class StateRead:
         
         self.T = np.nanmean(self.data['T'],axis=0)
         self.S = np.nanmean(self.data['S'],axis=0)
+        self.V = np.nanmean(self.data['V'],axis=0)
+        self.U = np.nanmean(self.data['U'],axis=0)
+        self.Vda = np.nanmean(np.nanmean(self.data['V'],axis=1),axis=0)
+        self.Uda = np.nanmean(np.nanmean(self.data['U'],axis=1),axis=0)
+
+        print 'Data read from '+self.path
 
     def getMeans(self,list_iter,list_var):
         file2read = netcdf.NetCDFFile(self.path+'state.nc','r')
@@ -218,7 +231,7 @@ class StateRead:
                 self.totalFluxes['Fram'] = fluxTransport(self.Fram['Flux'])
                 
                 # Bering fillign
-                self.Bering['Flux'][t,:,:] = self.data['U'][t,:,80*kk:89*kk,178*kk]*Area_x[:,80*kk:89*kk,178*kk]
+                self.Bering['Flux'][t,:,:] = -self.data['U'][t,:,80*kk:89*kk,178*kk]*Area_x[:,80*kk:89*kk,178*kk]
                 self.Bering['FluxSum'][t] = np.nansum(np.nansum(self.Bering['Flux'][t,:,:]))
                 self.Bering['FluxT'][t,:,:] = self.Bering['Flux'][t,:,:]*\
                                             self.data['T'][t,:,80*kk:89*kk,178*kk]*Area_x[:,80*kk:89*kk,178*kk]
@@ -316,7 +329,8 @@ class StateRead:
         self.psi_max = np.nanmax(self.psi_max,axis=1)
         self.psi_min = np.nanmin(self.psi,axis=1)
         self.psi_min = np.nanmin(self.psi_min,axis=1)
-        
+        self.psi_ave = np.nanmean(self.psi,axis=0)
+
     def topoCalc(self):
         topo,topo_opposit = Topostrophy(self.data['U'],self.data['V'])
         self.topo = topo
@@ -367,3 +381,9 @@ class StateRead:
         self.seaice['SIheff'][:,0,self.hfacc[0,:,:]==0] = np.nan
         self.seaice['SIuice'][:,0,self.hfacc[0,:,:]==0] = np.nan
         self.seaice['SIvice'][:,0,self.hfacc[0,:,:]==0] = np.nan
+
+    def mxldepthread(self,list_var):
+        file2read = netcdf.NetCDFFile(self.path+'MXLDEPTH.nc','r')
+        MXLDEPTH = file2read.variables['MXLDEPTH']
+        self.mxldepth = MXLDEPTH[list_var]*1
+        self.mxldepth[hfacc[0,:,:]==0]=np.nan

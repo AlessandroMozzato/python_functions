@@ -268,6 +268,15 @@ def dynStDiag_extract(x,iter_list):
                 uvel_lv_mean, uvel_lv_max, uvel_lv_min, \
                 ke_lv_mean, ke_lv_max, time_lv_tot
 
+def rho(t,s):
+    # This function calculates the density temperature and salinity
+    s0 = 35
+    t0 = 5
+    alpha = 0.0002
+    beta = 0.0002
+    rho0 = 1027.5
+    return rho0*(1 - alpha*(t - t0) + beta*(s - s0))
+
 def titles():
     titles = {'theta_mean' : 'Temperature Mean', 'theta_min' : 'Temperature Min', 'theta_max' :  'Temperature Max', \
             'eta_mean' : 'ETA mean', 'eta_max' : 'ETA max', 'eta_min' : 'ETA min', 'salt_mean' : 'Salinity Mean' , \
@@ -341,6 +350,7 @@ class MonitorRead():
         self.dataDyn['uvel_lv_mean'], self.dataDyn['uvel_lv_max'], self.dataDyn['uvel_lv_min'], \
         self.dataDyn['ke_lv_mean'], self.dataDyn['ke_lv_max'],\
         self.dataDyn['time_lv'] = dynStDiag_extract(path,iters)
+        self.dataDyn['rho_lv_mean'] = rho(self.dataDyn['theta_lv_mean'],self.dataDyn['salt_lv_mean'])
         self.dataDyn['time_lv_years'] = (self.dataDyn['time_lv']- self.dataDyn['time_lv'][0])/(360*60*60*24)
     
     def title(self,title,color):
