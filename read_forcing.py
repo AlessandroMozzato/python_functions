@@ -95,6 +95,36 @@ def read_forcing(path,dataset,init_year,tot_years):
         
     return clim
 
+def read_core(path):
+    # This function is meant to read and store the forcing fields
+    # Load adata files
+    xdim = 320
+    ydim = 160
+    
+    data_ave = {'v10m': np.zeros(366*4) , 'u10m' : np.zeros(366*4), 'rain': np.zeros(366), \
+                'dlw' : np.zeros(366) , 'dsw' : np.zeros(366) , 'tmp2m_degC' : np.zeros(366*4) , \
+                'spfh2m' : np.zeros(366*4), 'rain': np.zeros(12),}
+    tdim_v = {'v10m': 366*4 , 'u10m' : 366*4, 'rain': 366, 'dlw' : 366 , 'dsw' : 366 , 'tmp2m_degC' : 366*4 , \
+                'spfh2m' : 366*4, 'rain': 12,}
+    
+    time_core = {'v10m': 366*4 , 'u10m' : 366*4, 'rain': 366, 'dlw' : 366 , 'dsw' : 366 , 'tmp2m_degC' : 366*4 , \
+                'spfh2m' : 366*4, 'rain': 12,}
+    for var in data_ave: 
+        name = path+'CORE2_'+str(var)
+        data_read = komod.mitbin(name,xdim=192,ydim=94,tdim=tdim_v[var],datatype='float32')
+        data_av = np.mean(np.mean(data_read,axis = 3),axis = 2).squeeze(axis = 1)
+        
+        if var == 'dlw' or var == 'dsw':
+            data_ave[var] = -data_av
+        else: 
+            data_ave[var] = data_av
+        
+        time_core[var] = np.array(range(len(data_av)))/float(tdim_v[var])
+
+    clim = {'data_ave' : data_ave}  
+    print 'read CORE2'
+    return clim,time_core
+
 def dataset_unity():
     titles = {'v10m': 'Meridional wind' , 'u10m' : 'Zonal wind', 'rain_new33': 'Precipitation new33', \
             'dlw' : 'Long wave radiation' , 'dsw' : 'Short wave radiation' , 'tmp2m_degC' : 'Temperature at 2m' , \

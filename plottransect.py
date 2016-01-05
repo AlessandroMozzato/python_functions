@@ -149,7 +149,7 @@ def comp_plot(data, region,npoints=15):
                     extend = 'both')
         axes.flat[ind].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = tempbounds,\
                     extend = 'both')
-        axes.flat[ind].set_title("Temperature "+data[run].title)
+        axes.flat[ind].set_title("T "+data[run].title)
         axes.flat[ind].title.set_fontsize('14')
         if ind == 0:
             axes.flat[ind].set_ylabel('m')
@@ -166,7 +166,7 @@ def comp_plot(data, region,npoints=15):
                     extend = 'both')
         axes.flat[ind+npl].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = saltbounds,\
                     extend = 'both')
-        axes.flat[ind+npl].set_title("Salinity "+data[run].title)
+        axes.flat[ind+npl].set_title("S "+data[run].title)
         axes.flat[ind+npl].title.set_fontsize('14')
         if ind == 0:
             axes.flat[ind+npl].set_ylabel('m')

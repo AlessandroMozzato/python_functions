@@ -162,6 +162,26 @@ class StateRead:
                             'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
                             'FluxTopT' : [], 'FluxMidT' : [] , 'FluxBotT' : []}
             
+            self.Fram1 = {'Flux' : np.zeros_like(self.data['V'][:,:,55*kk:85*kk,78*kk]) , \
+                            'FluxSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
+                            'FluxS' : np.zeros_like(self.data['S'][:,:,55*kk:85*kk,78*kk]),\
+                            'FluxSumS' : np.zeros_like(self.data['S'][:,0,0,0]),\
+                            'FluxT' : np.zeros_like(self.data['T'][:,:,55*kk:85*kk,78*kk]),\
+                            'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0]),\
+                            'FluxTop' : [], 'FluxMid' : [] , 'FluxBot' : [], \
+                            'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
+                            'FluxTopT' : [], 'FluxMidT' : [] , 'FluxBotT' : []}
+                    
+            self.Fram2 = {'Flux' : np.zeros_like(self.data['V'][:,:,60*kk:83*kk,72*kk]) , \
+                            'FluxSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
+                            'FluxS' : np.zeros_like(self.data['S'][:,:,60*kk:83*kk,72*kk]),\
+                            'FluxSumS' : np.zeros_like(self.data['S'][:,0,0,0]),\
+                            'FluxT' : np.zeros_like(self.data['T'][:,:,60*kk:83*kk,72*kk]),\
+                            'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0]),\
+                            'FluxTop' : [], 'FluxMid' : [] , 'FluxBot' : [], \
+                            'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
+                            'FluxTopT' : [], 'FluxMidT' : [] , 'FluxBotT' : []}
+            
             self.Bering = {'Flux' : np.zeros_like(self.data['U'][:,:,80*kk:89*kk,178*kk]) , \
                             'FluxSum' : np.zeros_like(self.data['U'][:,0,0,0]),\
                             'FluxS' : np.zeros_like(self.data['S'][:,:,80*kk:89*kk,178*kk]),\
@@ -180,7 +200,27 @@ class StateRead:
                             'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0]),\
                             'FluxTop' : [], 'FluxMid' : [] , 'FluxBot' : [], \
                             'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
-                            'FluxTopT' : [], 'FluxMidT' : [] , 'FluxBotT' : []}                 
+                            'FluxTopT' : [], 'FluxMidT' : [] , 'FluxBotT' : []}   
+            
+            self.Davis1 = {'Flux' : np.zeros_like(self.data['U'][:,:,135*kk,52*kk:73*kk]), \
+                            'FluxSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
+                            'FluxS' : np.zeros_like(self.data['S'][:,:,135*kk,52*kk:73*kk]),\
+                            'FluxSumS' : np.zeros_like(self.data['S'][:,0,0,0]),\
+                            'FluxT' : np.zeros_like(self.data['T'][:,:,135*kk,52*kk:73*kk]),\
+                            'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0]),\
+                            'FluxTop' : [], 'FluxMid' : [] , 'FluxBot' : [], \
+                            'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
+                            'FluxTopT' : [], 'FluxMidT' : [] , 'FluxBotT' : []}   
+            
+            self.Davis2 = {'Flux' : np.zeros_like(self.data['U'][:,:,113*kk:135*kk,75*kk]) , \
+                            'FluxSum' : np.zeros_like(self.data['U'][:,0,0,0]),\
+                            'FluxS' : np.zeros_like(self.data['S'][:,:,113*kk:135*kk,75*kk]),\
+                            'FluxSumS' : np.zeros_like(self.data['S'][:,0,0,0]),\
+                            'FluxT' : np.zeros_like(self.data['T'][:,:,113*kk:135*kk,75*kk]),\
+                            'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0]),\
+                            'FluxTop' : [], 'FluxMid' : [] , 'FluxBot' : [], \
+                            'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
+                            'FluxTopT' : [], 'FluxMidT' : [] , 'FluxBotT' : []} 
             
             self.Denmark = {'Flux' : np.zeros_like(self.data['U'][:,:,100*kk,37*kk:48*kk]) , \
                             'FluxSum' : np.zeros_like(self.data['U'][:,0,0,0]),\
@@ -197,60 +237,133 @@ class StateRead:
                                         self.data['U'][:,:,40*kk:58*kk,68*kk]*Area_y[:,40*kk:58*kk,68*kk]),axis=2),\
                             'FluxSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
                             'FluxS' : np.concatenate((\
-                                        self.data['V'][:,:,40*kk,53*kk:68*kk]*Area_x[:,40*kk,53*kk:68*kk],\
-                                        self.data['U'][:,:,40*kk:58*kk,68*kk]*Area_y[:,40*kk:58*kk,68*kk]),axis=2),\
+                                        self.data['S'][:,:,40*kk,53*kk:68*kk]*Area_x[:,40*kk,53*kk:68*kk],\
+                                        self.data['S'][:,:,40*kk:58*kk,68*kk]*Area_y[:,40*kk:58*kk,68*kk]),axis=2),\
                             'FluxSumS' : np.zeros_like(self.data['S'][:,0,0,0]),\
                             'FluxT' : np.concatenate((\
-                                        self.data['V'][:,:,40*kk,53*kk:68*kk]*Area_x[:,40*kk,53*kk:68*kk],\
-                                        self.data['U'][:,:,40*kk:58*kk,68*kk]*Area_y[:,40*kk:58*kk,68*kk]),axis=2),\
+                                        self.data['T'][:,:,40*kk,53*kk:68*kk]*Area_x[:,40*kk,53*kk:68*kk],\
+                                        self.data['T'][:,:,40*kk:58*kk,68*kk]*Area_y[:,40*kk:58*kk,68*kk]),axis=2),\
                             'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0])}
 
+            
+            # Barents 1
+            self.Barents1 = {'Flux' : np.concatenate((\
+                                        self.data['V'][:,:,45*kk,49*kk:66*kk]*Area_x[:,45*kk,49*kk:66*kk],\
+                                        self.data['U'][:,:,45*kk:58*kk,66*kk]*Area_y[:,45*kk:58*kk,66*kk]),axis=2),\
+                            'FluxSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
+                            'FluxS' : np.concatenate((\
+                                        self.data['S'][:,:,45*kk,49*kk:66*kk]*Area_x[:,45*kk,49*kk:66*kk],\
+                                        self.data['S'][:,:,45*kk:58*kk,66*kk]*Area_y[:,45*kk:58*kk,66*kk]),axis=2),\
+                            'FluxSumS' : np.zeros_like(self.data['S'][:,0,0,0]),\
+                            'FluxT' : np.concatenate((\
+                                        self.data['T'][:,:,45*kk,49*kk:66*kk]*Area_x[:,45*kk,49*kk:66*kk],\
+                                        self.data['T'][:,:,45*kk:58*kk,66*kk]*Area_y[:,45*kk:58*kk,66*kk]),axis=2),\
+                            'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0])}
+        
+            # Barents 2
+            self.Barents2 = {'Flux' : np.concatenate((\
+                                        self.data['V'][:,:,58*kk,49*kk:66*kk]*Area_x[:,58*kk,49*kk:66*kk],\
+                                        self.data['U'][:,:,45*kk:58*kk,49*kk]*Area_y[:,45*kk:58*kk,49*kk]),axis=2),\
+                            'FluxSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
+                            'FluxS' : np.concatenate((\
+                                        self.data['S'][:,:,58*kk,49*kk:66*kk]*Area_x[:,58*kk,49*kk:66*kk],\
+                                        self.data['S'][:,:,45*kk:58*kk,49*kk]*Area_y[:,45*kk:58*kk,49*kk]),axis=2),\
+                            'FluxSumS' : np.zeros_like(self.data['S'][:,0,0,0]),\
+                            'FluxT' : np.concatenate((\
+                                        self.data['T'][:,:,58*kk,49*kk:66*kk]*Area_x[:,58*kk,49*kk:66*kk],\
+                                        self.data['T'][:,:,45*kk:58*kk,49*kk]*Area_y[:,45*kk:58*kk,49*kk]),axis=2),\
+                            'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0])}
+        
             self.Norwice = {'Flux' : np.concatenate((\
                                         self.data['U'][:,:,60*kk:95*kk,15*kk]*Area_y[:,60*kk:95*kk,15*kk],\
                                         self.data['V'][:,:,95*kk,15*kk:30*kk]*Area_x[:,95*kk,15*kk:30*kk]),axis=2),\
                             'FluxSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
                             'FluxS' : np.concatenate((\
-                                        self.data['U'][:,:,60*kk:95*kk,15*kk]*Area_y[:,60*kk:95*kk,15*kk],\
-                                        self.data['V'][:,:,95*kk,15*kk:30*kk]*Area_x[:,95*kk,15*kk:30*kk]),axis=2),\
+                                        self.data['S'][:,:,60*kk:95*kk,15*kk]*Area_y[:,60*kk:95*kk,15*kk],\
+                                        self.data['S'][:,:,95*kk,15*kk:30*kk]*Area_x[:,95*kk,15*kk:30*kk]),axis=2),\
                             'FluxSumS' : np.zeros_like(self.data['S'][:,0,0,0]),\
                             'FluxT' : np.concatenate((\
-                                        self.data['U'][:,:,60*kk:95*kk,15*kk]*Area_y[:,60*kk:95*kk,15*kk],\
-                                        self.data['V'][:,:,95*kk,15*kk:30*kk]*Area_x[:,95*kk,15*kk:30*kk]),axis=2),\
+                                        self.data['T'][:,:,60*kk:95*kk,15*kk]*Area_y[:,60*kk:95*kk,15*kk],\
+                                        self.data['T'][:,:,95*kk,15*kk:30*kk]*Area_x[:,95*kk,15*kk:30*kk]),axis=2),\
                             'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0])}
 
             for t in range(self.data['V'].shape[0]):
                 # Fram fillign
-                self.Fram['Flux'][t,:,:] = self.data['V'][t,:,58*kk:80*kk,76*kk]*Area_x[:,58*kk:80*kk,76*kk]
+                self.Fram['Flux'][t,:,:] = self.data['U'][t,:,58*kk:80*kk,76*kk]*Area_y[:,58*kk:80*kk,76*kk]
                 self.Fram['FluxSum'][t] = np.nansum(np.nansum(self.Fram['Flux'][t,:,:]))
                 self.Fram['FluxT'][t,:,:] = self.Fram['Flux'][t,:,:]*\
-                                            self.data['T'][t,:,58*kk:80*kk,76*kk]*Area_x[:,58*kk:80*kk,76*kk]
+                                            self.data['T'][t,:,58*kk:80*kk,76*kk]*Area_y[:,58*kk:80*kk,76*kk]
                 self.Fram['FluxSumT'][t] = np.nansum(np.nansum(self.Fram['FluxT'][t,:,:]))
                 self.Fram['FluxS'][t,:,:] = self.Fram['Flux'][t,:,:]*\
-                                            self.data['S'][t,:,58*kk:80*kk,76*kk]*Area_x[:,58*kk:80*kk,76*kk]
+                                            self.data['S'][t,:,58*kk:80*kk,76*kk]*Area_y[:,58*kk:80*kk,76*kk]
                 self.Fram['FluxSumS'][t] = np.nansum(np.nansum(self.Fram['FluxS'][t,:,:]))                    
                 self.totalFluxes['Fram'] = fluxTransport(self.Fram['Flux'])
+
+                # Fram 1 fillign
+                self.Fram1['Flux'][t,:,:] = self.data['U'][t,:,55*kk:85*kk,78*kk]*Area_y[:,55*kk:85*kk,78*kk]
+                self.Fram1['FluxSum'][t] = np.nansum(np.nansum(self.Fram1['Flux'][t,:,:]))
+                self.Fram1['FluxT'][t,:,:] = self.Fram1['Flux'][t,:,:]*\
+                                            self.data['T'][t,:,55*kk:85*kk,78*kk]*Area_y[:,55*kk:85*kk,78*kk]
+                self.Fram1['FluxSumT'][t] = np.nansum(np.nansum(self.Fram1['FluxT'][t,:,:]))
+                self.Fram1['FluxS'][t,:,:] = self.Fram1['Flux'][t,:,:]*\
+                                            self.data['S'][t,:,55*kk:85*kk,78*kk]*Area_y[:,55*kk:85*kk,78*kk]
+                self.Fram1['FluxSumS'][t] = np.nansum(np.nansum(self.Fram1['FluxS'][t,:,:]))                    
+                self.totalFluxes['Fram1'] = fluxTransport(self.Fram1['Flux'])
+                
+                # Fram 2 fillign
+                self.Fram2['Flux'][t,:,:] = self.data['U'][t,:,60*kk:83*kk,72*kk]*Area_y[:,60*kk:83*kk,72*kk]
+                self.Fram2['FluxSum'][t] = np.nansum(np.nansum(self.Fram['Flux'][t,:,:]))
+                self.Fram2['FluxT'][t,:,:] = self.Fram2['Flux'][t,:,:]*\
+                                            self.data['T'][t,:,60*kk:83*kk,72*kk]*Area_y[:,60*kk:83*kk,72*kk]
+                self.Fram2['FluxSumT'][t] = np.nansum(np.nansum(self.Fram2['FluxT'][t,:,:]))
+                self.Fram2['FluxS'][t,:,:] = self.Fram2['Flux'][t,:,:]*\
+                                            self.data['S'][t,:,60*kk:83*kk,72*kk]*Area_y[:,60*kk:83*kk,72*kk]
+                self.Fram2['FluxSumS'][t] = np.nansum(np.nansum(self.Fram2['FluxS'][t,:,:]))                    
+                self.totalFluxes['Fram2'] = fluxTransport(self.Fram2['Flux'])                    
                 
                 # Bering fillign
-                self.Bering['Flux'][t,:,:] = -self.data['U'][t,:,80*kk:89*kk,178*kk]*Area_x[:,80*kk:89*kk,178*kk]
+                self.Bering['Flux'][t,:,:] = -self.data['U'][t,:,80*kk:89*kk,178*kk]*Area_y[:,80*kk:89*kk,178*kk]
                 self.Bering['FluxSum'][t] = np.nansum(np.nansum(self.Bering['Flux'][t,:,:]))
                 self.Bering['FluxT'][t,:,:] = self.Bering['Flux'][t,:,:]*\
-                                            self.data['T'][t,:,80*kk:89*kk,178*kk]*Area_x[:,80*kk:89*kk,178*kk]
+                                            self.data['T'][t,:,80*kk:89*kk,178*kk]*Area_y[:,80*kk:89*kk,178*kk]
                 self.Bering['FluxSumT'][t] = np.nansum(np.nansum(self.Bering['FluxT'][t,:,:]))
                 self.Bering['FluxS'][t,:,:] = self.Bering['Flux'][t,:,:]*\
-                                            self.data['S'][t,:,80*kk:89*kk,178*kk]*Area_x[:,80*kk:89*kk,178*kk]
+                                            self.data['S'][t,:,80*kk:89*kk,178*kk]*Area_y[:,80*kk:89*kk,178*kk]
                 self.Bering['FluxSumS'][t] = np.nansum(np.nansum(self.Bering['FluxS'][t,:,:]))
                 self.totalFluxes['Bering'] = fluxTransport(self.Bering['Flux'])
                 
                 # Davis fillign
-                self.Davis['Flux'][t,:,:] = self.data['U'][t,:,113*kk:135*kk,75*kk]*Area_x[:,113*kk:135*kk,75*kk]
+                self.Davis['Flux'][t,:,:] = self.data['U'][t,:,113*kk:135*kk,75*kk]*Area_y[:,113*kk:135*kk,75*kk]
                 self.Davis['FluxSum'][t] = np.nansum(np.nansum(self.Davis['Flux'][t,:,:]))
                 self.Davis['FluxT'][t,:,:] = self.Davis['Flux'][t,:,:]*\
-                                            self.data['T'][t,:,113*kk:135*kk,75*kk]*Area_x[:,113*kk:135*kk,75*kk]
+                                            self.data['T'][t,:,113*kk:135*kk,75*kk]*Area_y[:,113*kk:135*kk,75*kk]
                 self.Davis['FluxSumT'][t] = np.nansum(np.nansum(self.Davis['FluxT'][t,:,:]))
                 self.Davis['FluxS'][t,:,:] = self.Davis['Flux'][t,:,:]*\
-                                            self.data['S'][t,:,113*kk:135*kk,75*kk]*Area_x[:,113*kk:135*kk,75*kk]
+                                            self.data['S'][t,:,113*kk:135*kk,75*kk]*Area_y[:,113*kk:135*kk,75*kk]
                 self.Davis['FluxSumS'][t] = np.nansum(np.nansum(self.Davis['FluxS'][t,:,:]))
                 self.totalFluxes['Davis'] = fluxTransport(self.Davis['Flux']) 
+                
+                # Davis1 fillign
+                self.Davis1['Flux'][t,:,:] = self.data['V'][t,:,135*kk,52*kk:73*kk]*Area_x[:,135*kk,52*kk:73*kk]
+                self.Davis1['FluxSum'][t] = np.nansum(np.nansum(self.Davis1['Flux'][t,:,:]))
+                self.Davis1['FluxT'][t,:,:] = self.Davis1['Flux'][t,:,:]*\
+                                            self.data['T'][t,:,135*kk,52*kk:73*kk]*Area_x[:,135*kk,52*kk:73*kk]
+                self.Davis1['FluxSumT'][t] = np.nansum(np.nansum(self.Davis1['FluxT'][t,:,:]))
+                self.Davis1['FluxS'][t,:,:] = self.Davis1['Flux'][t,:,:]*\
+                                            self.data['S'][t,:,135*kk,52*kk:73*kk]*Area_x[:,135*kk,52*kk:73*kk]
+                self.Davis1['FluxSumS'][t] = np.nansum(np.nansum(self.Davis1['FluxS'][t,:,:]))
+                self.totalFluxes['Davis1'] = fluxTransport(self.Davis1['Flux']) 
+                
+                # Davis 2 fillign
+                self.Davis2['Flux'][t,:,:] = self.data['U'][t,:,113*kk:135*kk,72*kk]*Area_y[:,113*kk:135*kk,72*kk]
+                self.Davis2['FluxSum'][t] = np.nansum(np.nansum(self.Davis2['Flux'][t,:,:]))
+                self.Davis2['FluxT'][t,:,:] = self.Davis2['Flux'][t,:,:]*\
+                                            self.data['T'][t,:,113*kk:135*kk,72*kk]*Area_y[:,113*kk:135*kk,72*kk]
+                self.Davis2['FluxSumT'][t] = np.nansum(np.nansum(self.Davis2['FluxT'][t,:,:]))
+                self.Davis2['FluxS'][t,:,:] = self.Davis2['Flux'][t,:,:]*\
+                                            self.data['S'][t,:,113*kk:135*kk,72*kk]*Area_y[:,113*kk:135*kk,72*kk]
+                self.Davis2['FluxSumS'][t] = np.nansum(np.nansum(self.Davis2['FluxS'][t,:,:]))
+                self.totalFluxes['Davis2'] = fluxTransport(self.Davis2['Flux']) 
 
                 # Barents fillng
                 self.Barents['Flux'][t,:,:] = np.concatenate((\
@@ -267,6 +380,38 @@ class StateRead:
                 self.Barents['FluxSumS'][t] = np.nansum(np.nansum(self.Barents['FluxS'][t,:,:]))
                 self.totalFluxes['Barents'] = fluxTransport(self.Barents['Flux'])
 
+                # Barents 1 fillng
+                y1 = 45; y2 = 58 ; x1 = 49 ; x2 = 66 # barents 1
+                self.Barents1['Flux'][t,:,:] = np.concatenate((\
+                                            self.data['V'][t,:,45*kk,49*kk:66*kk]*Area_x[:,45*kk,49*kk:66*kk],\
+                                            self.data['U'][t,:,45*kk:58*kk,66*kk]*Area_y[:,45*kk:58*kk,66*kk]),axis=1)
+                self.Barents1['FluxSum'][t] = np.nansum(np.nansum(self.Barents1['Flux'][t,:,:]))
+                self.Barents1['FluxT'][t,:,:] = self.Barents1['Flux'][t,:,:]*np.concatenate((\
+                                            self.data['T'][t,:,45*kk,49*kk:66*kk]*Area_x[:,45*kk,49*kk:66*kk],\
+                                            self.data['T'][t,:,45*kk:58*kk,66*kk]*Area_y[:,45*kk:58*kk,66*kk]),axis=1)
+                self.Barents1['FluxSumT'][t] = np.nansum(np.nansum(self.Barents1['FluxT'][t,:,:]))
+                self.Barents1['FluxS'][t,:,:] = self.Barents1['Flux'][t,:,:]*np.concatenate((\
+                                            self.data['T'][t,:,45*kk,49*kk:66*kk]*Area_x[:,45*kk,49*kk:66*kk],\
+                                            self.data['T'][t,:,45*kk:58*kk,66*kk]*Area_y[:,45*kk:58*kk,66*kk]),axis=1)
+                self.Barents1['FluxSumS'][t] = np.nansum(np.nansum(self.Barents1['FluxS'][t,:,:]))
+                self.totalFluxes['Barents1'] = fluxTransport(self.Barents1['Flux'])
+                
+                # Barents 2 fillng
+                y1 = 45; y2 = 58 ; x1 = 49 ; x2 = 66 # barents 1
+                self.Barents2['Flux'][t,:,:] = np.concatenate((\
+                                            self.data['V'][t,:,58*kk,49*kk:66*kk]*Area_x[:,58*kk,49*kk:66*kk],\
+                                            self.data['U'][t,:,45*kk:58*kk,49*kk]*Area_y[:,45*kk:58*kk,49*kk]),axis=1)
+                self.Barents2['FluxSum'][t] = np.nansum(np.nansum(self.Barents2['Flux'][t,:,:]))
+                self.Barents2['FluxT'][t,:,:] = self.Barents1['Flux'][t,:,:]*np.concatenate((\
+                                            self.data['T'][t,:,58*kk,49*kk:66*kk]*Area_x[:,58*kk,49*kk:66*kk],\
+                                            self.data['T'][t,:,45*kk:58*kk,49*kk]*Area_y[:,45*kk:58*kk,49*kk]),axis=1)
+                self.Barents2['FluxSumT'][t] = np.nansum(np.nansum(self.Barents2['FluxT'][t,:,:]))
+                self.Barents2['FluxS'][t,:,:] = self.Barents1['Flux'][t,:,:]*np.concatenate((\
+                                            self.data['T'][t,:,58*kk,49*kk:66*kk]*Area_x[:,58*kk,49*kk:66*kk],\
+                                            self.data['T'][t,:,45*kk:58*kk,49*kk]*Area_y[:,45*kk:58*kk,49*kk]),axis=1)
+                self.Barents2['FluxSumS'][t] = np.nansum(np.nansum(self.Barents2['FluxS'][t,:,:]))
+                self.totalFluxes['Barents2'] = fluxTransport(self.Barents2['Flux'])
+                
                 # Denmark filling
                 self.Denmark['Flux'][t,:,:] = self.data['V'][t,:,100*kk,37*kk:48*kk]*Area_x[:,100*kk,37*kk:48*kk]
                 self.Denmark['FluxSum'][t] = np.nansum(np.nansum(self.Denmark['Flux'][t,:,:]))
@@ -280,8 +425,8 @@ class StateRead:
 
                 # Norwey-Iceland strait filling
                 self.Norwice['Flux'][t,:,:] = np.concatenate((\
-                                        self.data['U'][t,:,60*kk:95*kk,15*kk]*Area_y[:,60*kk:95*kk,15*kk],\
-                                        self.data['V'][t,:,95*kk,15*kk:30*kk]*Area_x[:,95*kk,15*kk:30*kk]),axis=1)
+                                        self.data['V'][t,:,60*kk:95*kk,15*kk]*Area_y[:,60*kk:95*kk,15*kk],\
+                                        self.data['U'][t,:,95*kk,15*kk:30*kk]*Area_x[:,95*kk,15*kk:30*kk]),axis=1)
                 self.Norwice['FluxSum'][t] = np.nansum(np.nansum(self.Barents['Flux'][t,:,:]))
                 self.Norwice['FluxT'][t,:,:] = self.Norwice['Flux'][t,:,:]*np.concatenate((\
                                         self.data['T'][t,:,60*kk:95*kk,15*kk]*Area_y[:,60*kk:95*kk,15*kk],\
@@ -341,6 +486,7 @@ class StateRead:
     
     def print_title(self):
         print self.title
+        
 
     def vorticity(self,list_var):
         # this functions reads vorticity/divergence/kynetic energy from the files
@@ -386,4 +532,4 @@ class StateRead:
         file2read = netcdf.NetCDFFile(self.path+'MXLDEPTH.nc','r')
         MXLDEPTH = file2read.variables['MXLDEPTH']
         self.mxldepth = MXLDEPTH[list_var]*1
-        self.mxldepth[hfacc[0,:,:]==0]=np.nan
+        self.mxldepth[:,0,self.hfacc[0,:,:]==0]=np.nan
