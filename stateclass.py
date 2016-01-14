@@ -13,6 +13,8 @@ import glob
 sys.path.append('/noc/users/am8e13/Python/python_functions/')
 from barotropic import *
 from topostrophy import *
+from rho import *
+from jmd95 import *
 
 class StateRead:
     def __init__(self):
@@ -83,6 +85,8 @@ class StateRead:
         self.X = X[:]*1
         Y = file2read.variables['Y']
         self.Y = Y[:]*1
+        Z = file2read.variables['Z']
+        self.Z = Z[:]*1
         file2read.close()
         
         self.data['T'][:,self.hfacc==0] = np.nan
@@ -90,9 +94,16 @@ class StateRead:
         self.data['V'][:,self.hfacs==0] = np.nan
         self.data['S'][:,self.hfacc==0] = np.nan
         self.data['Eta'][:,self.hfacc[0,:,:]==0] = np.nan
-        
         self.T = np.nanmean(self.data['T'],axis=0)
         self.S = np.nanmean(self.data['S'],axis=0)
+        self.rho = rho(self.S,self.T)
+        self.rhop = rhop(self.S,self.T)
+
+        # calculate jmd 95 density
+        self.rho_jmd = np.zeros_like(self.rho)
+        for z in range(len(self.Z)):
+            self.rho_jmd[z,:,:] = densjmd95(self.S[z,:,:],self.T[z,:,:],-9.81*self.Z[z]*1027.5)
+        
         self.V = np.nanmean(self.data['V'],axis=0)
         self.U = np.nanmean(self.data['U'],axis=0)
         self.Vda = np.nanmean(np.nanmean(self.data['V'],axis=1),axis=0)

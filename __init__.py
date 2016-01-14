@@ -17,3 +17,5 @@ from arctic_regions import *
 from read_forcing import *
 from interact import *
 from literature_data import *
+from jmd95 import *
+from rho import *

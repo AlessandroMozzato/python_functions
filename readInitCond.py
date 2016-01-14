@@ -21,14 +21,8 @@ import komod
 sys.path.append('/noc/users/am8e13/Python/PyNIO-1.4.0/')
 import Nio
 
-def rho(t,s):
-    # This function calculates the density temperature and salinity                                                                 
-    s0 = 35
-    t0 = 5
-    alpha = 0.0002
-    beta = 0.0002
-    rho0 = 1027.5
-    return rho0*(1 - alpha*(t - t0) + beta*(s - s0))
+from rho import *
+from jmd95 import *
 
 class Woa:
     def __init__(self):
@@ -37,6 +31,7 @@ class Woa:
         self.bathy = bathy[:]*1
         Z = file2read.variables['Z']
         Z = Z[:]*1
+        self.Z = Z
         lat = file2read.variables['YC']
         self.lat = lat[:]*1
         lon = file2read.variables['XC']
@@ -49,14 +44,21 @@ class Woa:
         self.S = komod.mitbin(file1,xdim=192,ydim=210,zdim=50,datatype='float32')
         self.S = np.squeeze(self.S,axis=0)
         self.S[self.bathy == 0] = np.nan
+        self.rho = rho(self.S,self.T)
+        self.rhop = rhop(self.S,self.T)
         self.depth = Z
+        # calculate jmd 95 density                                                                                                                                       
+        self.rho_jmd = np.zeros_like(self.rho)
+        for z in range(len(self.Z)):
+            self.rho_jmd[z,:,:] = densjmd95(self.S[z,:,:],self.T[z,:,:],-9.81*self.Z[z]*1025)
+
         self.title = 'Woa'
         self.dataDyn = {}
         temp_lv = np.nanmean(np.nanmean(self.T,axis=1),axis=1)
         self.dataDyn['theta_lv_mean'] = (np.ones((400,1))*temp_lv)
         temp_lv = np.nanmean(np.nanmean(self.S,axis=1),axis=1)
         self.dataDyn['salt_lv_mean'] = (np.ones((400,1))*temp_lv)
-        self.dataDyn['rho_lv_mean'] = rho(self.dataDyn['theta_lv_mean'],self.dataDyn['salt_lv_mean'])
+        self.dataDyn['rho_lv_mean'] = rhop(self.dataDyn['salt_lv_mean'],self.dataDyn['theta_lv_mean'])
 
 class Phc:
     def __init__(self):
@@ -65,6 +67,7 @@ class Phc:
         self.bathy = bathy[:]*1
         Z = file2read.variables['Z']
         Z = Z[:]*1
+        self.Z = Z
         lat = file2read.variables['XC']
         self.lat = lat[:]*1
         lon = file2read.variables['YC']
@@ -77,11 +80,18 @@ class Phc:
         self.S = komod.mitbin(file1,xdim=192,ydim=210,zdim=50,datatype='float32')
         self.S = np.squeeze(self.S,axis=0)
         self.S[self.bathy == 0] = np.nan
+        self.rho = rho(self.S,self.T)
+        self.rhop = rhop(self.S,self.T)
         self.depth = Z
+        # calculate jmd 95 density                                                                                                                                       
+        self.rho_jmd = np.zeros_like(self.rho)
+        for z in range(len(self.Z)):
+            self.rho_jmd[z,:,:] = densjmd95(self.S[z,:,:],self.T[z,:,:],-9.81*self.Z[z]*1025)
+
         self.title = 'PHC'
         self.dataDyn = {}
         temp_lv = np.nanmean(np.nanmean(self.T,axis=1),axis=1)
         self.dataDyn['theta_lv_mean'] = (np.ones((400,1))*temp_lv)
         temp_lv = np.nanmean(np.nanmean(self.S,axis=1),axis=1)
         self.dataDyn['salt_lv_mean'] = (np.ones((400,1))*temp_lv)
-        self.dataDyn['rho_lv_mean'] = rho(self.dataDyn['theta_lv_mean'],self.dataDyn['salt_lv_mean'])
+        self.dataDyn['rho_lv_mean'] = rhop(self.dataDyn['salt_lv_mean'],self.dataDyn['theta_lv_mean'])

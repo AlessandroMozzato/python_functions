@@ -123,23 +123,25 @@ def get_transect1(lat, lon, data, lat1, lon1, lat2, lon2, npoints = 10, pdif = 1
 
 def comp_plot(data, region,npoints=15):
     import matplotlib as mpl
-    # This function plots time evolution of temperature/salinity on a transect.
-    # Transect are: Fram Strait, Bering Strait ...
+    # This function plots time evolution of temperature/salinity on a transect.                                                                                           
+    # Transect are: Fram Strait, Bering Strait ...                                                                                                                        
     npl = len(data)
-    
+
     lat1 = region[0]
     lon1 = region[1]
     lat2 = region[2]
     lon2 = region[3]
-    fig, axes = plt.subplots(2,npl,sharex='col', sharey='row') 
+    fig, axes = plt.subplots(3,npl,sharex='col', sharey='row')
     ind = 0
 
     tempbounds = [-2,-1,0,1,2,3,4,5,6,7,8]
     saltbounds = [30,33,34,35,36,37]
+    rhobounds = [26,26.25,26.5,26.75,27,27.25,27.5,27.75,28,28.25,28.5,28.75,29]
     for run in data:
+        # plot temperature
         data_prof, x_kilometers, m_grid, n_grid  = \
         get_transect1(data[run].lat, data[run].lon, data[run].T , lat1, lon1, lat2, lon2,\
-                                                                 npoints = npoints, pdif = 1, norep=False)   
+                                                                 npoints = npoints, pdif = 1, norep=False)
         Z,z2 = lastnan(data_prof,data[run].depth)
         if ind == 0:
             imT = axes.flat[ind].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=-2,vmax=10,levels = tempbounds,\
@@ -153,11 +155,11 @@ def comp_plot(data, region,npoints=15):
         axes.flat[ind].title.set_fontsize('14')
         if ind == 0:
             axes.flat[ind].set_ylabel('m')
-        #axes.flat[ind].set_xlabel('km')
-        
+
+        # plot salinity
         data_prof, x_kilometers, m_grid, n_grid  = \
         get_transect1(data[run].lat, data[run].lon, data[run].S , lat1, lon1, lat2, lon2,\
-                                                                 npoints = npoints, pdif = 1, norep=False) 
+                                                                 npoints = npoints, pdif = 1, norep=False)
         if ind == 0:
             imS = axes.flat[ind+npl].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=28,vmax=38,levels = saltbounds,\
                     extend = 'both')
@@ -172,26 +174,45 @@ def comp_plot(data, region,npoints=15):
             axes.flat[ind+npl].set_ylabel('m')
         axes.flat[ind+npl].set_xlabel('km')
         
-        
-        #for item in ([axes.flat[ind].title, axes.flat[ind].xaxis.label, axes.flat[ind].yaxis.label]):
-         #   item.set_fontsize(14)
-        ind = ind + 1
-    
-    cbar_ax = fig.add_axes([2.15, 0.2, 0.045, 0.7])
-    cbar = plt.colorbar(imS, cax=cbar_ax,)
-    cbar.ax.set_ylabel('psu')  
-    
-    cbar_ax2 = fig.add_axes([2.15, 1.2, 0.045, 0.7])
-    cbar2 = plt.colorbar(imT, cax=cbar_ax2)
-    cbar2.ax.set_ylabel('C')  
-    
-    fig.subplots_adjust(right=2.1,top=2.)
+        # plot density
+        data_prof, x_kilometers, m_grid, n_grid  = \
+        get_transect1(data[run].lat, data[run].lon, data[run].rhop-1000 , lat1, lon1, lat2, lon2,\
+                                                                 npoints = npoints, pdif = 1, norep=False)
+        if ind == 0:
+            imrho = axes.flat[ind+npl*2].contourf(x_kilometers,Z,data_prof[0:z2,:],\
+                    vmin=26,vmax=29,levels = rhobounds,\
+                    extend = 'both')
+        else:
+            axes.flat[ind+npl*2].contourf(x_kilometers,Z,data_prof[0:z2,:],\
+                    vmin=26,vmax=29,levels = rhobounds,\
+                    extend = 'both')
+        axes.flat[ind+npl*2].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = rhobounds,\
+                    extend = 'both')
+        axes.flat[ind+npl*2].set_title("rho "+data[run].title)
+        axes.flat[ind+npl*2].title.set_fontsize('14')
+        if ind == 0:
+            axes.flat[ind+npl*2].set_ylabel('m')
+        axes.flat[ind+npl*2].set_xlabel('km')
 
+        #for item in ([axes.flat[ind].title, axes.flat[ind].xaxis.label, axes.flat[ind].yaxis.label]):                                                                    
+         #   item.set_fontsize(14)                                                                                                                                        
+        ind = ind + 1
+
+    cbar_ax = fig.add_axes([2.15, 2.2, 0.045, 0.7])
+    cbar = plt.colorbar(imT, cax=cbar_ax,)
+    cbar.ax.set_ylabel('C')
+
+    cbar_ax2 = fig.add_axes([2.15, 1.2, 0.045, 0.7])
+    cbar2 = plt.colorbar(imS, cax=cbar_ax2)
+    cbar2.ax.set_ylabel('psu')
+
+    cbar_ax3 = fig.add_axes([2.15, 0.2, 0.045, 0.7])
+    cbar3 = plt.colorbar(imrho, cax=cbar_ax3)
+    cbar3.ax.set_ylabel('kg/m^3 - 1000')
+    
+    fig.subplots_adjust(right=2.1,top=3.)
 
 # This function plots surface data
-"""Komod plot module 
-Contain mostly set of wrapper functions for map plotting with Basemap.
-Can be used with any 2D data, not necessarily MITgcm."""
 
 import numpy as np
 from mpl_toolkits.basemap import Basemap
