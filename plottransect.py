@@ -133,10 +133,11 @@ def comp_plot(data, region,npoints=15):
     lon2 = region[3]
     fig, axes = plt.subplots(3,npl,sharex='col', sharey='row')
     ind = 0
-
-    tempbounds = [-2,-1,0,1,2,3,4,5,6,7,8]
-    saltbounds = [30,33,34,35,36,37]
-    rhobounds = [26,26.25,26.5,26.75,27,27.25,27.5,27.75,28,28.25,28.5,28.75,29]
+    
+    t_min = -2 ; t_max = 8 ; tempbounds = np.linspace(t_min,t_max,15) ; tempbounds1 = np.linspace(t_min,t_max,5)
+    s_min = 30 ; s_max = 35.5 ; saltbounds = np.linspace(s_min,s_max,15) ; saltbounds1 = np.linspace(s_min,s_max,5)
+    r_min = 26 ; r_max = 29 ; rhobounds = np.linspace(r_min,r_max,15) ; rhobounds1 = np.linspace(r_min,r_max,5)
+    
     for run in data:
         # plot temperature
         data_prof, x_kilometers, m_grid, n_grid  = \
@@ -144,13 +145,13 @@ def comp_plot(data, region,npoints=15):
                                                                  npoints = npoints, pdif = 1, norep=False)
         Z,z2 = lastnan(data_prof,data[run].depth)
         if ind == 0:
-            imT = axes.flat[ind].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=-2,vmax=10,levels = tempbounds,\
-                    extend = 'both')
+            imT = axes.flat[ind].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=t_min,vmax=t_max,levels = tempbounds,\
+                    extend = 'both', cmap = cmocean.cm.temperature)
         else:
-            axes.flat[ind].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=-2,vmax=10,levels = tempbounds,\
-                    extend = 'both')
-        axes.flat[ind].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = tempbounds,\
-                    extend = 'both')
+            axes.flat[ind].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=t_min,vmax=t_max,levels = tempbounds,\
+                    extend = 'both', cmap = cmocean.cm.temperature)
+        #axes.flat[ind].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = tempbounds1,\
+        #            extend = 'both')
         axes.flat[ind].set_title("T "+data[run].title)
         axes.flat[ind].title.set_fontsize('14')
         if ind == 0:
@@ -161,33 +162,32 @@ def comp_plot(data, region,npoints=15):
         get_transect1(data[run].lat, data[run].lon, data[run].S , lat1, lon1, lat2, lon2,\
                                                                  npoints = npoints, pdif = 1, norep=False)
         if ind == 0:
-            imS = axes.flat[ind+npl].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=28,vmax=38,levels = saltbounds,\
-                    extend = 'both')
+            imS = axes.flat[ind+npl].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=s_min,vmax=s_max,levels = saltbounds,\
+                    extend = 'both' , cmap = cmocean.cm.salt)
         else:
-            axes.flat[ind+npl].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=28,vmax=38,levels = saltbounds,\
-                    extend = 'both')
-        axes.flat[ind+npl].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = saltbounds,\
-                    extend = 'both')
+            axes.flat[ind+npl].contourf(x_kilometers,Z,data_prof[0:z2,:],vmin=s_min,vmax=s_max,levels = saltbounds,\
+                    extend = 'both' , cmap = cmocean.cm.salt)
+        #axes.flat[ind+npl].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = saltbounds1,\
+        #            extend = 'both')
         axes.flat[ind+npl].set_title("S "+data[run].title)
         axes.flat[ind+npl].title.set_fontsize('14')
         if ind == 0:
             axes.flat[ind+npl].set_ylabel('m')
-        axes.flat[ind+npl].set_xlabel('km')
         
         # plot density
         data_prof, x_kilometers, m_grid, n_grid  = \
-        get_transect1(data[run].lat, data[run].lon, data[run].rhop-1000 , lat1, lon1, lat2, lon2,\
+        get_transect1(data[run].lat, data[run].lon, data[run].rhop - 1000 , lat1, lon1, lat2, lon2,\
                                                                  npoints = npoints, pdif = 1, norep=False)
         if ind == 0:
             imrho = axes.flat[ind+npl*2].contourf(x_kilometers,Z,data_prof[0:z2,:],\
-                    vmin=26,vmax=29,levels = rhobounds,\
-                    extend = 'both')
+                    vmin=r_min,vmax=r_max,levels = rhobounds,\
+                    extend = 'both',cmap = cmocean.cm.rho)
         else:
             axes.flat[ind+npl*2].contourf(x_kilometers,Z,data_prof[0:z2,:],\
-                    vmin=26,vmax=29,levels = rhobounds,\
-                    extend = 'both')
-        axes.flat[ind+npl*2].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = rhobounds,\
-                    extend = 'both')
+                    vmin=r_min,vmax=r_max,levels = rhobounds,\
+                    extend = 'both',cmap = cmocean.cm.rho)
+        #axes.flat[ind+npl*2].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = rhobounds,\
+        #            extend = 'both')
         axes.flat[ind+npl*2].set_title("rho "+data[run].title)
         axes.flat[ind+npl*2].title.set_fontsize('14')
         if ind == 0:
@@ -199,15 +199,15 @@ def comp_plot(data, region,npoints=15):
         ind = ind + 1
 
     cbar_ax = fig.add_axes([2.15, 2.2, 0.045, 0.7])
-    cbar = plt.colorbar(imT, cax=cbar_ax,)
+    cbar = plt.colorbar(imT, cax=cbar_ax,ticks=[-1,0,1,2,3,4,5,6,7])
     cbar.ax.set_ylabel('C')
 
     cbar_ax2 = fig.add_axes([2.15, 1.2, 0.045, 0.7])
-    cbar2 = plt.colorbar(imS, cax=cbar_ax2)
+    cbar2 = plt.colorbar(imS, cax=cbar_ax2,ticks=[30,31,32,33,34,35])
     cbar2.ax.set_ylabel('psu')
 
     cbar_ax3 = fig.add_axes([2.15, 0.2, 0.045, 0.7])
-    cbar3 = plt.colorbar(imrho, cax=cbar_ax3)
+    cbar3 = plt.colorbar(imrho, cax=cbar_ax3,ticks=[26,26.5,27,27.5,28,28.5,29])
     cbar3.ax.set_ylabel('kg/m^3 - 1000')
     
     fig.subplots_adjust(right=2.1,top=3.)
