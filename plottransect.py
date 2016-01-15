@@ -11,6 +11,8 @@ import komod
 sys.path.append('/noc/users/am8e13/Python/PyNIO-1.4.0/')
 import Nio
 
+import cmocean
+
 def lastnan(data,Z):
     # This function finds the last layer with some non-NaN value
     z = 0
