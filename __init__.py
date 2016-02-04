@@ -3,6 +3,7 @@
 from barotropic import *
 from topostrophy import *
 from monitorclass import *
+from monitor_region_class import *
 from stateclass import *
 from heatbalance import *
 from plotting_function import *
