@@ -301,6 +301,7 @@ def plot_psi(monitor_list,vimin,vimax,cmap,row=1,col=3):
         axes.flat[2].set_title('Maximum barotropic streamfunction')
         
     fig.subplots_adjust(right=2.5,top=1.2)
+plot_psi(pert,-1,7,matplotlib.cm.jet)
 
 def plot_flux_inout(monitor_list,var_list,row=2,col=4):
     # this function is meant to plot monitor variables   
