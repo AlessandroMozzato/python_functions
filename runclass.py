@@ -524,7 +524,7 @@ class RunRead:
                                             self.data['T'][t,:,45*kk:58*kk,49*kk]),axis=1)
                 self.fluxes['Barents2']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Barents2']['FluxS'][t,:,:]))
                 self.totalFluxes['Barents2'] = fluxTransport(self.fluxes['Barents2']['Flux'])
-                
+               
                 # Denmark filling
                 self.fluxes['Denmark']['Flux'][t,:,:] = self.data['V'][t,:,100*kk,37*kk:48*kk]*Area_x[:,100*kk,37*kk:48*kk]
                 self.fluxes['Denmark']['FluxSum'][t] = np.nansum(np.nansum(self.fluxes['Denmark']['Flux'][t,:,:]))
@@ -872,144 +872,22 @@ def dynStDiag(x,iter_list):
         ke_max_lv=file2read.variables['momKE_lv_max']
         ke_max_lv=ke_max_lv[:]*1
         
+        # option added to make the old spinup readable
+        if theta_mean_lv.shape[1] == 1:
+            theta_mean_lv = np.tile(theta_mean_lv,(1,7,1))
+            theta_max_lv = np.tile(theta_max_lv,(1,7,1))
+            theta_min_lv = np.tile(theta_min_lv,(1,7,1))
+            salt_mean_lv = np.tile(salt_mean_lv,(1,7,1))
+            salt_max_lv = np.tile(salt_max_lv,(1,7,1))
+            salt_min_lv = np.tile(salt_min_lv,(1,7,1))
+            vvel_mean_lv = np.tile(vvel_mean_lv,(1,7,1))
+            vvel_max_lv = np.tile(vvel_max_lv,(1,7,1))
+            vvel_min_lv = np.tile(vvel_min_lv,(1,7,1))
+            uvel_mean_lv = np.tile(uvel_mean_lv,(1,7,1))
+            uvel_max_lv = np.tile(uvel_max_lv,(1,7,1))
+            uvel_min_lv = np.tile(uvel_min_lv,(1,7,1))
+            ke_mean_lv = np.tile(ke_mean_lv,(1,7,1))
+            ke_max_lv = np.tile(ke_max_lv,(1,7,1))
+            
         theta_lv_mean_tot =np.concatenate([theta_lv_mean_tot , theta_mean_lv],axis=0)
-        theta_lv_max_tot =np.concatenate([theta_lv_max_tot , theta_max_lv])
-        theta_lv_min_tot =np.concatenate([theta_lv_min_tot , theta_min_lv])
-        salt_lv_mean_tot =np.concatenate([salt_lv_mean_tot , salt_mean_lv])
-        salt_lv_max_tot =np.concatenate([salt_lv_max_tot , salt_max_lv])
-        salt_lv_min_tot =np.concatenate([salt_lv_min_tot , salt_min_lv])
-        vvel_lv_mean_tot =np.concatenate([vvel_lv_mean_tot , vvel_mean_lv])
-        vvel_lv_max_tot =np.concatenate([vvel_lv_max_tot , vvel_max_lv])
-        vvel_lv_min_tot =np.concatenate([vvel_lv_min_tot , vvel_min_lv])
-        uvel_lv_mean_tot =np.concatenate([uvel_lv_mean_tot , uvel_mean_lv])
-        uvel_lv_max_tot =np.concatenate([uvel_lv_max_tot , uvel_max_lv])
-        uvel_lv_min_tot =np.concatenate([uvel_lv_min_tot , uvel_min_lv])
-        ke_lv_mean_tot =np.concatenate([ke_lv_mean_tot , ke_mean_lv])
-        ke_lv_max_tot =np.concatenate([ke_lv_max_tot , ke_max_lv])
-        time_lv_tot = np.concatenate([time_lv_tot , time_lv])
-        
-        # 1D fields
-        time_seconds = file2read.variables['T']
-        time_seconds=time_seconds[:]*1    
-        theta_mean=file2read.variables['THETA_ave']
-        theta_mean=theta_mean[:]*1    
-        theta_max=file2read.variables['THETA_max']
-        theta_max=theta_max[:]*1
-        theta_min=file2read.variables['THETA_min']
-        theta_min=theta_min[:]*1    
-        salt_mean=file2read.variables['SALT_ave']
-        salt_mean=salt_mean[:]*1
-        salt_max=file2read.variables['SALT_max']
-        salt_max=salt_max[:]*1
-        salt_min=file2read.variables['SALT_min']
-        salt_min=salt_min[:]*1    
-        #sst_mean=file2read.variables['dynstat_sst_mean']
-        #sst_mean=sst_mean[:]*1
-        #sst_max=file2read.variables['dynstat_sst_max']
-        #sst_max=sst_max[:]*1
-        #sst_min=file2read.variables['dynstat_sst_max']
-        #sst_min=sst_min[:]*1    
-        #sss_mean=file2read.variables['dynstat_sss_mean']
-        #sss_mean=sss_mean[:]*1
-        #sss_mim=file2read.variables['dynstat_sss_min']
-        #sss_min=sss_mean[:]*1
-        #sss_max=file2read.variables['dynstat_sss_max']
-        #sss_max=sss_max[:]*1    
-        eta_mean=file2read.variables['ETAN_ave']
-        eta_mean=eta_mean[:]*1
-        eta_min=file2read.variables['ETAN_min']
-        eta_min=eta_min[:]*1
-        eta_max=file2read.variables['ETAN_max']
-        eta_max=eta_max[:]*1    
-        uvel_mean=file2read.variables['UVEL_ave']
-        uvel_mean=uvel_mean[:]*1
-        uvel_max=file2read.variables['UVEL_max']
-        uvel_max=uvel_max[:]*1
-        uvel_min=file2read.variables['UVEL_min']
-        uvel_min=uvel_min[:]*1    
-        vvel_mean=file2read.variables['VVEL_ave']
-        vvel_mean=vvel_mean[:]*1
-        vvel_max=file2read.variables['VVEL_max']
-        vvel_max=vvel_max[:]*1
-        vvel_min=file2read.variables['VVEL_min']
-        vvel_min=vvel_min[:]*1    
-        ke_mean=file2read.variables['momKE_ave']
-        ke_mean=ke_mean[:]*1
-        ke_max=file2read.variables['momKE_max']
-        ke_max=ke_max[:]*1
-        ke_vol=file2read.variables['momKE_vol']
-        ke_vol=ke_vol[:]*1
-        
-        time_seconds_tot =np.concatenate([time_seconds_tot , time_seconds])
-        theta_mean_tot =np.concatenate([theta_mean_tot , theta_mean])
-        theta_min_tot = np.concatenate([theta_min_tot , theta_min])
-        theta_max_tot =np.concatenate([theta_max_tot , theta_max])    
-        salt_mean_tot =np.concatenate([salt_mean_tot , salt_mean])
-        salt_min_tot =np.concatenate([salt_min_tot , salt_min])
-        salt_max_tot =np.concatenate([salt_max_tot , salt_max])
-        #sst_mean_tot =np.concatenate([sst_mean_tot , sst_mean])
-        #sst_min_tot =np.concatenate([sst_min_tot , sst_min])
-        #sst_max_tot =np.concatenate([sst_max_tot , sst_max])    
-        #sss_mean_tot =np.concatenate([sss_mean_tot , sss_mean])
-        #sss_min_tot =np.concatenate([sss_min_tot , sss_min])
-        #sss_max_tot =np.concatenate([sss_max_tot , sss_max])    
-        vvel_mean_tot =np.concatenate([vvel_mean_tot , vvel_mean])
-        vvel_min_tot =np.concatenate([vvel_min_tot , vvel_min])
-        vvel_max_tot =np.concatenate([vvel_max_tot , vvel_max])    
-        uvel_mean_tot =np.concatenate([uvel_mean_tot , uvel_mean])
-        uvel_min_tot =np.concatenate([uvel_min_tot , uvel_min])
-        uvel_max_tot =np.concatenate([uvel_max_tot , uvel_max])
-        eta_mean_tot =np.concatenate([eta_mean_tot , eta_mean])
-        eta_min_tot = np.concatenate([eta_min_tot , eta_min])
-        eta_max_tot =np.concatenate([eta_max_tot , eta_max])
-        ke_mean_tot =np.concatenate([ke_mean_tot , ke_mean])
-        ke_vol_tot = np.concatenate([ke_vol_tot , ke_vol])
-        ke_max_tot =np.concatenate([ke_max_tot , ke_max])
-
-    
-    return     theta_mean_tot, theta_max_tot, theta_min_tot, eta_mean_tot, eta_max_tot, eta_min_tot, \
-                salt_mean_tot, salt_max_tot, salt_min_tot, sss_mean_tot, sss_max_tot, sss_min_tot, \
-                sst_mean_tot, sst_max_tot, sst_min_tot, vvel_mean_tot, vvel_max_tot, vvel_min_tot, \
-                uvel_mean_tot, uvel_max_tot, uvel_min_tot, ke_mean_tot, ke_max_tot, ke_vol_tot, \
-                time_seconds_tot,\
-                theta_lv_mean_tot, theta_lv_max_tot, theta_lv_min_tot, \
-                salt_lv_mean_tot, salt_lv_max_tot, salt_lv_min_tot, \
-                vvel_lv_mean_tot, vvel_lv_max_tot, vvel_lv_min_tot, \
-                uvel_lv_mean_tot, uvel_lv_max_tot, uvel_lv_min_tot, \
-                ke_lv_mean_tot, ke_lv_max_tot, time_lv_tot
-
-def mon_titles():
-    titles = {'theta_mean' : 'Temperature Mean', 'theta_min' : 'Temperature Min', 'theta_max' :  'Temperature Max', \
-            'eta_mean' : 'ETA mean', 'eta_max' : 'ETA max', 'eta_min' : 'ETA min', 'salt_mean' : 'Salinity Mean' , \
-            'salt_max' : 'Salinity Max' , 'salt_min' : 'Salinity Min' , 'sss_mean': 'SSS mean' , \
-            'sss_max' : 'SSS max', 'sss_min' : 'SSS min', 'sst_mean' : 'SST mean', 'sst_max' : 'SST max' , \
-            'sst_min' : 'SST min', 'vvel_mean' : 'V mean', 'vvel_max' : 'V max' , 'vvel_min' : 'V min', \
-            'uvel_mean' : 'U mean', 'uvel_max' : 'U max', 'uvel_min' : 'U min', 'ke_mean' : 'Kinetic mean', \
-            'ke_max' : 'Kinetic max', 'ke_vol' : 'Kinetic volume', 'seaice_area_max' : 'Seaice area max', \
-            'seaice_area_min' : 'Seaice area min', 'seaice_area_mean' : 'Seaice area mean', \
-            'seaice_heff_max' : 'Seaice thickness max', 'seaice_heff_min' : 'Seaicea thickness max', \
-            'seaice_heff_mean' : 'Seaice thickness mean', 'time_seconds' : 'Time seconds' , \
-          'time_years' : 'Time years'} 
-    unity = {'theta_mean' : 'C', 'theta_min' : 'C', 'theta_max' :  'C', \
-            'eta_mean' : 'm', 'eta_max' : 'm', 'eta_min' : 'm', 'salt_mean' : 'psu' , \
-            'salt_max' : 'psu' , 'salt_min' : 'psu' , 'sss_mean': 'psu' , \
-            'sss_max' : 'psu', 'sss_min' : 'psu', 'sst_mean' : 'C', 'sst_max' : 'C' , \
-            'sst_min' : 'C', 'vvel_mean' : 'm/s', 'vvel_max' : 'm/s' , 'vvel_min' : 'm/s', \
-            'uvel_mean' : 'm/s', 'uvel_max' : 'm/s', 'uvel_min' : 'm/s', 'ke_mean' : 'm^2/s^2', \
-            'ke_max' : 'm^2/s^2', 'ke_vol' : 'm^2/s^2', 'seaice_area_max' : '%', \
-            'seaice_area_min' : '%', 'seaice_area_mean' : '%', \
-            'seaice_heff_max' : 'm', 'seaice_heff_min' : 'm', \
-            'seaice_heff_mean' : 'm', 'time_seconds' : 's' , 'time_seconds_ice' : 's', 'time_years' : 'Years',\
-          'time_years_ice' : 'Years'} 
-    time = {'theta_mean' : 'time_years', 'theta_min' : 'time_years', 'theta_max' :  'time_years', \
-        'eta_mean' : 'time_years', 'eta_max' : 'time_years', 'eta_min' : 'time_years', \
-        'salt_mean' : 'time_years' , 'salt_max' : 'time_years' , 'salt_min' : 'time_years' , \
-        'sss_mean': 'time_years' , 'sss_max' : 'time_years', 'sss_min' : 'time_years', \
-        'sst_mean' : 'time_years', 'sst_max' : 'time_years' ,'sst_min' : 'time_years', \
-        'vvel_mean' : 'time_years', 'vvel_max' : 'time_years' , 'vvel_min' : 'time_years', \
-        'uvel_mean' : 'time_years', 'uvel_max' : 'time_years', 'uvel_min' : 'time_years', \
-        'ke_mean' : 'time_years', 'ke_max' : 'time_years', 'ke_vol' : 'time_years', \
-        'seaice_area_max' : 'time_years_ice', 'seaice_area_min' : 'time_years_ice', \
-        'seaice_area_mean' : 'time_years_ice', 'seaice_heff_max' : 'time_years_ice', \
-        'seaice_heff_min' : 'time_years_ice', 'seaice_heff_mean' : 'time_years_ice'} 
-    return titles,unity,time
+        theta_lv_max_t
