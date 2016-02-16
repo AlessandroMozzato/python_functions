@@ -178,31 +178,13 @@ class RunRead:
         self.Uda = np.nanmean(np.nanmean(self.data['U'],axis=1),axis=0)
 
         print 'Data read from '+self.path
-
-    def saveflux(self,fold):
-        save_flux(self,fold)
-
-    def read_flux(self,fold):
-        self.fluxes['Fram'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
-                            'FluxSumS'  : [] , 'FluxSumT' : []  }
-        self.fluxes['Davis'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
-                            'FluxSumS'  : [] , 'FluxSumT' : []  }
-        self.fluxes['Barents'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
-                            'FluxSumS'  : [] , 'FluxSumT' : []  }
-        self.fluxes['Bering'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
-                            'FluxSumS'  : [] , 'FluxSumT' : []  }
-        self.fluxes['Denmark'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
-                            'FluxSumS'  : [] , 'FluxSumT' : []  }
-        self.fluxes['Norwice'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
-                            'FluxSumS'  : [] , 'FluxSumT' : []  }
         
+    def read_flux(self,fold):
         file2read = netcdf.NetCDFFile('/scratch/general/am8e13/results_saved/'+fold+'/fluxes.nc', 'r') 
         for var in ['Davis' , 'Fram' , 'Norwice' , 'Denmark' , 'Barents' , 'Bering']:
             for flux in ['FluxSumS' , 'FluxSumT' , 'FluxInSum' , 'FluxOutSum' ]:
                 temp = file2read.variables[var+'_'+flux]
                 self.fluxes[var][flux] = temp[:]*1
-        temp = file2read.variables['years']
-        self.fluxes['years'] = temp[:]*1
 
     def fluxCalc(self):
             def fluxTransport(data):
@@ -589,23 +571,6 @@ class RunRead:
         self.psi_min = np.nanmin(self.psi,axis=1)
         self.psi_min = np.nanmin(self.psi_min,axis=1)
         self.psi_ave = np.nanmean(self.psi,axis=0)
-
-    # We save the barotropic streamfunction
-    def savepsi(self,fold):
-        save_psi(self,fold)
-
-    # We read the saved barotropic streamfunction
-    def read_psi(self,fold):
-        file2read = netcdf.NetCDFFile('/scratch/general/am8e13/results_saved/'+fold+'/barostream.nc', 'r') 
-        self.barostream = {}
-        temp = file2read.variables['psi_max']
-        self.barostream['psi_max']= temp[:]*1
-        temp = file2read.variables['psi_min']
-        self.barostream['psi_min']= temp[:]*1
-        temp = file2read.variables['psi_mean']
-        self.barostream['psi_mean']= temp[:]*1
-        temp = file2read.variables['psi_years']
-        self.barostream['years']= temp[:]*1
 
     def topoCalc(self):
         topo,topo_opposit = Topostrophy(self.data['U'],self.data['V'])
@@ -1121,8 +1086,6 @@ def save_flux(data,fold):
             temp = f.createVariable(name, 'float', ('time',))
             # data
             temp[:] = data.fluxes[var][flux]
-    temp = f.createVariable('years', 'float', ('time',))
-    temp[:] = data.years
     f.close()
 
 def save_psi(data,fold): 
@@ -1142,6 +1105,4 @@ def save_psi(data,fold):
     temp[:] = data.psi_min
     temp = f.createVariable('psi_mean', 'float', ('time',))
     temp[:] = data.psi_mean
-    temp = f.createVariable('psi_years', 'float', ('time',))
-    temp[:] = data.years
     f.close()

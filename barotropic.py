@@ -14,12 +14,14 @@ import glob
 
 def baro_stream(vel):
     ### This function calculates the barotropic streamfunction for a nt nz ny nx array returning a nt ny nx array                  
-    ### The function works for both 18 and 36km                                                                                     
+    ### The function works for both 18 and 36km and 9 km                                                                                    
     if vel.shape[2] == 192:
         x="/scratch/general/am8e13/results36km"
     elif vel.shape[2] == 384:
         x="/scratch/general/am8e13/results18km"
-
+    elif vel.shape[2] == 768:
+        x="/scratch/general/am8e13/results9km"
+    
     os.chdir(x)
     file2read = netcdf.NetCDFFile("grid.nc",'r')
     hfacw = file2read.variables['HFacW']
@@ -31,8 +33,8 @@ def baro_stream(vel):
     dydz = np.zeros_like(hfacw)
     psi = np.zeros_like(vel[:,1,:,:])
     # Volume calculation   
-    for k in range(drf.shape[0]):                                                                                                           dydz[k,:,:] = drf[k]*np.multiply(dyg,hfacw[k,:,:])
-
+    for k in range(drf.shape[0]):                                                                                                           
+        dydz[k,:,:] = drf[k]*np.multiply(dyg,hfacw[k,:,:])
     for temp in range(vel.shape[0]):
         utemp = np.zeros_like(hfacw)
         utemp[:,:,:] = dydz[:,:,:]*vel[temp,:,:,:]
@@ -47,11 +49,13 @@ def baro_stream(vel):
 
 def baro_stream_old(vel):
     ### This function calculates the barotropic streamfunction for a nt nz ny nx array returning a nt ny nx array                   
-    ### The function works for both 18 and 36km                                                                                     
+    ### The function works for both 18 and 36km and 9km                                                                                   
     if vel.shape[2] == 192:
         x="/scratch/general/am8e13/results36km"
     elif vel.shape[2] == 384:
         x="/scratch/general/am8e13/results18km"
+    elif vel.shape[2] == 768:
+        x="/scratch/general/am8e13/results9km"
 
     os.chdir(x)
     file2read = netcdf.NetCDFFile("grid.nc",'r')
