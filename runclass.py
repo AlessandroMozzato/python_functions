@@ -185,10 +185,22 @@ class RunRead:
     def read_flux(self,fold):
         self.fluxes['Fram'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
                             'FluxSumS'  : [] , 'FluxSumT' : []  }
+        self.fluxes['Fram1'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
+                            'FluxSumS'  : [] , 'FluxSumT' : []  }
+        self.fluxes['Fram2'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
+                            'FluxSumS'  : [] , 'FluxSumT' : []  } 
         self.fluxes['Davis'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
+                            'FluxSumS'  : [] , 'FluxSumT' : []  }
+        self.fluxes['Davis1'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
+                            'FluxSumS'  : [] , 'FluxSumT' : []  }
+        self.fluxes['Davis2'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
                             'FluxSumS'  : [] , 'FluxSumT' : []  }
         self.fluxes['Barents'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
                             'FluxSumS'  : [] , 'FluxSumT' : []  }
+        self.fluxes['Barents1'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
+                            'FluxSumS'  : [] , 'FluxSumT' : []  }
+        self.fluxes['Barents2'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
+                            'FluxSumS'  : [] , 'FluxSumT' : []  }        
         self.fluxes['Bering'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
                             'FluxSumS'  : [] , 'FluxSumT' : []  }
         self.fluxes['Denmark'] = { 'FluxSum' : [] , 'FluxInSum' : [] , 'FluxOutSum' : [] ,
@@ -197,8 +209,9 @@ class RunRead:
                             'FluxSumS'  : [] , 'FluxSumT' : []  }
         
         file2read = netcdf.NetCDFFile('/scratch/general/am8e13/results_saved/'+fold+'/fluxes.nc', 'r') 
-        for var in ['Davis' , 'Fram' , 'Norwice' , 'Denmark' , 'Barents' , 'Bering']:
-            for flux in ['FluxSumS' , 'FluxSumT' , 'FluxInSum' , 'FluxOutSum' ]:
+        for var in ['Davis' , 'Davis1' , 'Davis2' , 'Fram' , 'Fram1', 'Fram2', 'Norwice' , \
+                        'Denmark' , 'Barents' , 'Barents1', 'Barents2','Bering', ]:
+            for flux in ['FluxSum' , 'FluxSumS' , 'FluxSumT' , 'FluxInSum' , 'FluxOutSum' ]:
                 temp = file2read.variables[var+'_'+flux]
                 self.fluxes[var][flux] = temp[:]*1
         temp = file2read.variables['years']
@@ -1115,7 +1128,7 @@ def save_flux(data,fold):
     f.createDimension('time', years)
     
     for var in data.fluxes:
-        for flux in ['FluxSumS' , 'FluxSumT' , 'FluxInSum' , 'FluxOutSum' ]:
+        for flux in ['FluxSum' , 'FluxSumS' , 'FluxSumT' , 'FluxInSum' , 'FluxOutSum' ]:
             # variable
             name = var+'_'+flux
             temp = f.createVariable(name, 'float', ('time',))
