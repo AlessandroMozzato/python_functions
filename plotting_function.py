@@ -5,6 +5,13 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
+def runningMeanFast(x, N):
+    return np.convolve(x, np.ones((N,))/N)[(N-1):]
+
+def reg_titles():
+    region_titles = {0 : 'Global' , 1 : 'Arctic' , 2 : 'Nord Seas' , 3 : 'North Atl'}
+    return region_titles
+
 def plot_field(field,years,vimin,vimax,cmap,setbad,unity,row=2,col=3,origin="lower"):
     # This function plots a 2D field, the field is meant to have NaNs on the land place
     # vimin is the minimun, vimax is the maximum, setbad is the NaN color, unity is the unity in the colorbar
@@ -128,23 +135,7 @@ def plot_monitor(monitor_list,var_list,row=2,col=2):
 
     fig.subplots_adjust(right=2.4,top=2.4)
 
-def plot_flux(var_list,monitor_list,location):
-    fig, axes = plt.subplots(4,3)
-    ax_ind = 0
-    for var in var_list:  
-        for mon in monitor_list:
-            axes.flat[ax_ind].plot(monitor_list[mon].years,monitor_list[mon].Fram[var])
-            axes.flat[ax_ind+3].plot(monitor_list[mon].years,monitor_list[mon].Barents[var])
-            axes.flat[ax_ind+6].plot(monitor_list[mon].years,monitor_list[mon].Denmark[var])
-            axes.flat[ax_ind+9].plot(monitor_list[mon].years,monitor_list[mon].Norwice[var])
-
-        axes.flat[ax_ind].set_title(var)
-        axes.flat[ax_ind+3].set_title(var)
-        ax_ind += 1
-        
-    fig.subplots_adjust(right=2.4,top=2.4)
-
-def plot_lv(monitor_list,var,reg,vimin,vimax,cmap,row=4,col=3):
+def plot_lv(monitor_list,var,reg,vimin,vimax,cmap,row=4):
     unit_titles = { 'theta_lv_mean' : 'T' , 'theta_lv_min' : 'T' , 'theta_lv_max' : 'T' , 
                 'salt_lv_mean' : 'S' , 'salt_lv_min' : 'S' , 'salt_lv_max' : 'S' ,
                 'rho_lv_mean' : 'Rho' , 'rho_lv_min' : 'Rho' , 'rho_lv_max' : 'Rho' , 
@@ -171,7 +162,8 @@ def plot_lv(monitor_list,var,reg,vimin,vimax,cmap,row=4,col=3):
               'vvel_lv_max' : [-0.01, 0, 0.01, 0.01]
              }
     
-    
+    col = len(monitor_list)
+     
     fig, axes = plt.subplots(nrows=row, ncols=col, sharex=True, sharey=True)
     ax_ind = 0
     ticks = np.linspace(vimin,vimax,5)
@@ -186,32 +178,33 @@ def plot_lv(monitor_list,var,reg,vimin,vimax,cmap,row=4,col=3):
         
         reg = 1
         regz = 46
-        ca = axes.flat[ax_ind + 3].pcolor(monitor_list[mon].dataDyn['time_lv_years'],monitor_list[mon].Z[0:regz],\
+        ca = axes.flat[ax_ind + col].pcolor(monitor_list[mon].dataDyn['time_lv_years'],monitor_list[mon].Z[0:regz],\
                     monitor_list[mon].dataDyn[var][:monitor_list[mon].dataDyn['time_lv_years'].shape[0],reg,0:regz].T,\
                     vmin = vimin, vmax = vimax, cmap = cmap,)
-        cbar = fig.colorbar(ca , ax=axes.flat[ax_ind + 3], ticks=ticks)
-        axes.flat[ax_ind + 3].set_title(unit_titles[var]+' '+reg_title[reg]+' '+monitor_list[mon].title)
+        cbar = fig.colorbar(ca , ax=axes.flat[ax_ind + col], ticks=ticks)
+        axes.flat[ax_ind + col].set_title(unit_titles[var]+' '+reg_title[reg]+' '+monitor_list[mon].title)
         
         reg = 2
         regz = 45
-        ca = axes.flat[ax_ind + 6].pcolor(monitor_list[mon].dataDyn['time_lv_years'],monitor_list[mon].Z[0:regz],\
+        ca = axes.flat[ax_ind + col*2].pcolor(monitor_list[mon].dataDyn['time_lv_years'],monitor_list[mon].Z[0:regz],\
                     monitor_list[mon].dataDyn[var][:monitor_list[mon].dataDyn['time_lv_years'].shape[0],reg,0:regz].T,\
                     vmin = vimin, vmax = vimax, cmap = cmap,)
-        cbar = fig.colorbar(ca , ax=axes.flat[ax_ind + 6], ticks=ticks)
-        axes.flat[ax_ind + 6].set_title(unit_titles[var]+' '+reg_title[reg]+' '+monitor_list[mon].title)
+        cbar = fig.colorbar(ca , ax=axes.flat[ax_ind + col*2], ticks=ticks)
+        axes.flat[ax_ind + col*2].set_title(unit_titles[var]+' '+reg_title[reg]+' '+monitor_list[mon].title)
         
         reg = 3
         regz = 50
-        ca = axes.flat[ax_ind + 9].pcolor(monitor_list[mon].dataDyn['time_lv_years'],monitor_list[mon].Z[0:regz],\
+        ca = axes.flat[ax_ind + col*3].pcolor(monitor_list[mon].dataDyn['time_lv_years'],monitor_list[mon].Z[0:regz],\
                     monitor_list[mon].dataDyn[var][:monitor_list[mon].dataDyn['time_lv_years'].shape[0],reg,0:regz].T,\
                     vmin = vimin, vmax = vimax, cmap = cmap,)
-        cbar = fig.colorbar(ca , ax=axes.flat[ax_ind + 9], ticks=ticks)
-        axes.flat[ax_ind + 9].set_title(unit_titles[var]+' '+reg_title[reg]+' '+monitor_list[mon].title)
-        axes.flat[ax_ind + 9].set_xlabel('Years')
+        cbar = fig.colorbar(ca , ax=axes.flat[ax_ind + col*3], ticks=ticks)
+        axes.flat[ax_ind + col*3].set_title(unit_titles[var]+' '+reg_title[reg]+' '+monitor_list[mon].title)
+        
+        axes.flat[ax_ind + col*3].set_xlabel('Years')
         axes.flat[0].set_ylabel('m')
-        axes.flat[3].set_ylabel('m')
-        axes.flat[6].set_ylabel('m')
-        axes.flat[9].set_ylabel('m')
+        axes.flat[col].set_ylabel('m')
+        axes.flat[col*2].set_ylabel('m')
+        axes.flat[col*3].set_ylabel('m')
         ax_ind += 1
         
     fig.subplots_adjust(right=2.4,top=2.8)
@@ -258,23 +251,27 @@ def plot_dynSt(monitor_list,var_list,reg,row=2,col=3):
                 axes.flat[ax_ind].plot(monitor_list[mon].dataDyn['time_lv_years'],\
                                        monitor_list[mon].dataDyn[var][1:,3,0],monitor_list[mon].color,alpha=0.2)
                 axes.flat[ax_ind].plot(monitor_list[mon].dataDyn['time_lv_years'][0:-12*3],\
-                                       runningMeanFast(monitor_list[mon].dataDyn[var][1:,0,0],12*3)[0:-12*3],monitor_list[mon].color)
+                        runningMeanFast(monitor_list[mon].dataDyn[var][1:,0,0],12*3)[0:-12*3],monitor_list[mon].color)
                 axes.flat[ax_ind].plot(monitor_list[mon].dataDyn['time_lv_years'][0:-12*3],\
-                                       runningMeanFast(monitor_list[mon].dataDyn[var][1:,1,0],12*3)[0:-12*3],monitor_list[mon].color)
+                        runningMeanFast(monitor_list[mon].dataDyn[var][1:,1,0],12*3)[0:-12*3],monitor_list[mon].color)
                 axes.flat[ax_ind].plot(monitor_list[mon].dataDyn['time_lv_years'][0:-12*3],\
-                                       runningMeanFast(monitor_list[mon].dataDyn[var][1:,2,0],12*3)[0:-12*3],monitor_list[mon].color)
+                        runningMeanFast(monitor_list[mon].dataDyn[var][1:,2,0],12*3)[0:-12*3],monitor_list[mon].color)
                 axes.flat[ax_ind].plot(monitor_list[mon].dataDyn['time_lv_years'][0:-12*3],\
-                                       runningMeanFast(monitor_list[mon].dataDyn[var][1:,3,0],12*3)[0:-12*3],monitor_list[mon].color)
+                        runningMeanFast(monitor_list[mon].dataDyn[var][1:,3,0],12*3)[0:-12*3],monitor_list[mon].color,\
+                                       label=monitor_list[mon].title)
                 axes.flat[ax_ind].set_title(titles[var])
             else:
                 axes.flat[ax_ind].plot(monitor_list[mon].dataDyn['time_lv_years'],\
                                        monitor_list[mon].dataDyn[var][1:,reg,0],monitor_list[mon].color,alpha=0.2)
                 axes.flat[ax_ind].plot(monitor_list[mon].dataDyn['time_lv_years'][0:-12*3],\
-                                       runningMeanFast(monitor_list[mon].dataDyn[var][1:,reg,0],12*3)[0:-12*3],monitor_list[mon].color)
+                                       runningMeanFast(monitor_list[mon].dataDyn[var][1:,reg,0],12*3)[0:-12*3]\
+                                       ,monitor_list[mon].color,label=monitor_list[mon].title)
                 axes.flat[ax_ind].set_title(titles[var]+' '+region[reg])
-            if ax_ind == 0:
-                print monitor_list[mon].title, monitor_list[mon].color
+
+            plt.legend(bbox_to_anchor=(-2.5, 1.02, 2., 1.5),
+                   ncol=4, mode="expand", borderaxespad=0.)
             axes.flat[ax_ind].set_ylabel(unity[var])
+            monitor_list[mon]
         ax_ind += 1
 
     fig.subplots_adjust(right=2.4,top=2.4)
@@ -282,42 +279,177 @@ def plot_dynSt(monitor_list,var_list,reg,row=2,col=3):
 def plot_psi(monitor_list,vimin,vimax,cmap,row=1,col=3):
     fig, axes = plt.subplots(nrows=row, ncols=col)
     for mon_v in monitor_list:        #print mon
-        axes.flat[0].plot(monitor_list[mon_v].years,monitor_list[mon_v].psi_mean,monitor_list[mon_v].color,alpha=0.2)
-        axes.flat[0].plot(monitor_list[mon_v].years[0:-12],runningMeanFast(monitor_list[mon_v].psi_mean,12)[0:-12],monitor_list[mon_v].color)
+        axes.flat[0].plot(monitor_list[mon_v].barostream['years'],monitor_list[mon_v].barostream['psi_mean'],\
+                          monitor_list[mon_v].color,alpha=0.2)
+        axes.flat[0].plot(monitor_list[mon_v].barostream['years'][0:-12],\
+                          runningMeanFast(monitor_list[mon_v].barostream['psi_mean'],12)[0:-12],\
+                          monitor_list[mon_v].color)
         axes.flat[0].set_xlabel('Month')
         axes.flat[0].set_ylabel('SV')
         axes.flat[0].set_title('Average barotropic streamfunction')
         
-        axes.flat[1].plot(monitor_list[mon_v].years,monitor_list[mon_v].psi_min,monitor_list[mon_v].color,alpha=0.2)
-        axes.flat[1].plot(monitor_list[mon_v].years[0:-12],runningMeanFast(monitor_list[mon_v].psi_min,12)[0:-12],monitor_list[mon_v].color)
+        axes.flat[1].plot(monitor_list[mon_v].barostream['years'],monitor_list[mon_v].barostream['psi_min'],\
+                          monitor_list[mon_v].color,alpha=0.2)
+        axes.flat[1].plot(monitor_list[mon_v].barostream['years'][0:-12],\
+                          runningMeanFast(monitor_list[mon_v].barostream['psi_min'],12)[0:-12],\
+                          monitor_list[mon_v].color)
         axes.flat[1].set_xlabel('Month')
         axes.flat[1].set_ylabel('SV')
         axes.flat[1].set_title('Minimum barotropic streamfunction')
         
-        axes.flat[2].plot(monitor_list[mon_v].years,monitor_list[mon_v].psi_max,monitor_list[mon_v].color,alpha=0.2)
-        axes.flat[2].plot(monitor_list[mon_v].years[0:-12],runningMeanFast(monitor_list[mon_v].psi_max,12)[0:-12],monitor_list[mon_v].color)
+        axes.flat[2].plot(monitor_list[mon_v].barostream['years'],monitor_list[mon_v].barostream['psi_max'],\
+                          monitor_list[mon_v].color,alpha=0.2)
+        axes.flat[2].plot(monitor_list[mon_v].barostream['years'][0:-12],\
+                          runningMeanFast(monitor_list[mon_v].barostream['psi_max'],12)[0:-12],\
+                          monitor_list[mon_v].color,label = monitor_list[mon_v].title)
         axes.flat[2].set_xlabel('Month')
         axes.flat[2].set_ylabel('SV')
         axes.flat[2].set_title('Maximum barotropic streamfunction')
         
+        plt.legend(bbox_to_anchor=(-2.5, 1.02, 2., .3),
+           ncol=4, mode="expand", borderaxespad=0.)
+        
     fig.subplots_adjust(right=2.5,top=1.2)
 
-def plot_flux_inout(monitor_list,var_list,row=2,col=4):
+def plot_flux_in_out(monitor_list,var_list,flux,row=2,col=3):
     # this function is meant to plot monitor variables   
     fig, axes = plt.subplots(row,col)
     ax_ind = 0
     for var in var_list:
         for mon in monitor_list:
-            axes.flat[ax_ind].plot(monitor_list[mon].years,monitor_list[mon].fluxes[var]['FluxSum']/10**6,monitor_list[mon].color,alpha=0.2)
-            axes.flat[ax_ind].plot(monitor_list[mon].years[0:-12],runningMeanFast(monitor_list[mon].fluxes[var]['FluxSum']/10**6,12)[0:-12],monitor_list[mon].color)
-            axes.flat[ax_ind].plot(monitor_list[mon].years,monitor_list[mon].fluxes[var]['FluxInSum']/10**6,monitor_list[mon].color,alpha=0.2)
-            axes.flat[ax_ind].plot(monitor_list[mon].years[0:-12],runningMeanFast(monitor_list[mon].fluxes[var]['FluxInSum']/10**6,12)[0:-12],monitor_list[mon].color)
-            axes.flat[ax_ind].plot(monitor_list[mon].years,monitor_list[mon].fluxes[var]['FluxOutSum']/10**6,monitor_list[mon].color,alpha=0.2)
-            axes.flat[ax_ind].plot(monitor_list[mon].years[0:-12],runningMeanFast(monitor_list[mon].fluxes[var]['FluxOutSum']/10**6,12)[0:-12],monitor_list[mon].color)
+            axes.flat[ax_ind].plot(monitor_list[mon].fluxes['years'],monitor_list[mon].fluxes[var]['FluxSum'],\
+                                   monitor_list[mon].color,alpha=0.2)
+            axes.flat[ax_ind].plot(monitor_list[mon].fluxes['years'][0:-12],\
+                runningMeanFast(monitor_list[mon].fluxes[var]['FluxSum'],12)[0:-12],monitor_list[mon].color)
+            axes.flat[ax_ind].plot(monitor_list[mon].fluxes['years'],\
+                            monitor_list[mon].fluxes[var]['FluxInSum'],monitor_list[mon].color,alpha=0.2)
+            axes.flat[ax_ind].plot(monitor_list[mon].fluxes['years'][0:-12],\
+                runningMeanFast(monitor_list[mon].fluxes[var]['FluxInSum'],12)[0:-12],monitor_list[mon].color)
+            axes.flat[ax_ind].plot(monitor_list[mon].fluxes['years'],\
+                            monitor_list[mon].fluxes[var]['FluxOutSum'],monitor_list[mon].color,alpha=0.2)
+            axes.flat[ax_ind].plot(monitor_list[mon].fluxes['years'][0:-12],\
+                runningMeanFast(monitor_list[mon].fluxes[var]['FluxOutSum'],12)[0:-12],\
+                                   monitor_list[mon].color,label = monitor_list[mon].title)
             axes.flat[ax_ind].set_title(var)
             axes.flat[ax_ind].set_ylabel('Sv')
             axes.flat[ax_ind].set_xlabel('Yers')
         ax_ind += 1
-
+        plt.legend(bbox_to_anchor=(-2.5, 1.02, 2., 1.5),
+                   ncol=4, mode="expand", borderaxespad=0.)
+            
     fig.subplots_adjust(right=2.4,top=2.4)
+
+def plot_flux(monitor_list,var_list,flux,row=2,col=3):
+    # this function is meant to plot monitor variables   
+    fig, axes = plt.subplots(row,col)
+    ax_ind = 0
+    for var in var_list:
+        for mon in monitor_list:
+            axes.flat[ax_ind].plot(monitor_list[mon].fluxes['years'],monitor_list[mon].fluxes[var][flux],\
+                                   monitor_list[mon].color,alpha=0.2)
+            axes.flat[ax_ind].plot(monitor_list[mon].fluxes['years'][0:-12],\
+                        runningMeanFast(monitor_list[mon].fluxes[var][flux],12)[0:-12],\
+                                   monitor_list[mon].color,label = monitor_list[mon].title)
+            axes.flat[ax_ind].set_title(var)
+            axes.flat[ax_ind].set_ylabel('Sv')
+            axes.flat[ax_ind].set_xlabel('Yers')
+        ax_ind += 1
+        plt.legend(bbox_to_anchor=(-2.5, 1.02, 2., 1.5),
+                   ncol=4, mode="expand", borderaxespad=0.)
+    fig.subplots_adjust(right=2.4,top=2.4)
+
+def plot_flux_total(monitor_list,var_list,row=2,col=3):
+    # this function is meant to plot monitor variables                                                                                 
+    ax_ind = 0
+    row = len(var_list)
+    flux_list = ['FluxSumFW','FluxSumS','FluxInSum','FluxOutSum','FluxSum']
+    col = len(flux_list)
+    fig, axes = plt.subplots(row,col, sharex=True,)
+    for var in var_list:
+        flux_ind = 0
+        for flux in flux_list:
+            for mon in monitor_list:
+                #axes.flat[ax_ind + flux_ind].plot(monitor_list[mon].fluxes['years'],monitor_list[mon].fluxes[var][flux],\
+                #                  monitor_list[mon].color,alpha=0.2)
+                axes.flat[ax_ind + flux_ind].plot(monitor_list[mon].fluxes['years'][0:-12],\
+                        runningMeanFast(monitor_list[mon].fluxes[var][flux],12)[0:-12],\
+                                  monitor_list[mon].color)
+            axes.flat[ax_ind + flux_ind].set_title(var+' '+flux[4:])
+            axes.flat[ax_ind + flux_ind].set_ylabel('Sv')  
+            axes.flat[(row-1)*col + flux_ind].set_xlabel('Years')  
+            flux_ind += 1
+        ax_ind += 1*len(flux_list)
+        plt.legend(bbox_to_anchor=(-5, 6, 3.5, 1.5),
+                ncol=4, mode="expand", borderaxespad=0.)
+    fig.subplots_adjust(right=2.4,top=4.4)
+    
+def plot_mxldepth(monitor_list,reg,row=1,col=3):
+    fig, axes = plt.subplots(nrows=row, ncols=col)
+    regions = reg_titles()
+    for mon_v in monitor_list:
+        axes.flat[0].plot(monitor_list[mon_v].mxldepth_years, -monitor_list[mon_v].mxldepth_mean[reg],\
+                          monitor_list[mon_v].color,alpha=0.2)
+        axes.flat[0].plot(monitor_list[mon_v].mxldepth_years[0:-12],\
+                runningMeanFast(-monitor_list[mon_v].mxldepth_mean[reg],12)[0:-12],
+                monitor_list[mon_v].color)
+        axes.flat[0].set_xlabel('Month')
+        axes.flat[0].set_ylabel('m')
+        axes.flat[0].set_title('Mean MXLDEPTH '+regions[reg])
+        
+        axes.flat[1].plot(monitor_list[mon_v].mxldepth_years, -monitor_list[mon_v].mxldepth_min[reg],
+                monitor_list[mon_v].color,alpha=0.2)
+        axes.flat[1].plot(monitor_list[mon_v].mxldepth_years[0:-12],\
+                runningMeanFast(-monitor_list[mon_v].mxldepth_min[reg],12)[0:-12],
+                monitor_list[mon_v].color)
+        axes.flat[1].set_xlabel('Month')
+        axes.flat[1].set_ylabel('m')
+        axes.flat[1].set_title('Min MXLDEPTH '+regions[reg])
+        
+        axes.flat[2].plot(monitor_list[mon_v].mxldepth_years,-monitor_list[mon_v].mxldepth_min[reg],
+                monitor_list[mon_v].color,alpha=0.2)
+        axes.flat[2].plot(monitor_list[mon_v].mxldepth_years[0:-12],\
+                runningMeanFast(-monitor_list[mon_v].mxldepth_max[reg],12)[0:-12],
+                monitor_list[mon_v].color,label = monitor_list[mon_v].title)
+        axes.flat[2].set_xlabel('Month')
+        axes.flat[2].set_ylabel('m')
+        axes.flat[2].set_title('Max MXLDEPTH '+regions[reg])
+        
+        plt.legend(bbox_to_anchor=(-2.5, 1.02, 2., .3),
+           ncol=4, mode="expand", borderaxespad=0.)
+        
+    fig.subplots_adjust(right=2.5,top=1.2)
+
+
+# this function plots different angles of ptracers
+def plot_ptracer(data,ptracer,timings):
+    ax_ind = 0
+    col = 3
+    row = len(timings)
+    fig, axes = plt.subplots(row,col)
+    vimin = 0.1
+    vimax = 100
+    
+    cmap= matplotlib.cm.hot
+    cmap.set_bad('grey',1.)
+    
+    for t in timings:
+        masked_array = np.ma.array(np.nanmean(data.ptracers[ptracer][t,:,:,:],axis=0),\
+                                   mask=np.isnan(np.nanmean(data.ptracers[ptracer][t,:,:,:],axis=0)))
+        ca = axes.flat[ax_ind*col ].imshow(masked_array,vmin = vimin, vmax = vimax, interpolation='nearest',\
+                                       cmap = cmap ,origin="left",aspect='auto',norm = matplotlib.colors.LogNorm())
+
+        masked_array = np.ma.array(np.nanmean(data.ptracers[ptracer][t,:,:,0:200],axis=1),\
+                                   mask=np.isnan(np.nanmean(data.ptracers[ptracer][t,:,:,0:200],axis=1)))
+        ca = axes.flat[ax_ind*col +1].pcolormesh(data.X[0:200],data.Z,masked_array,vmin = vimin, vmax = vimax,cmap=cmap,
+                                                 norm = matplotlib.colors.LogNorm())
+        axes.flat[ax_ind*col+1].set_title("Perturbation "+ptracer+" after "+str(round(data.ptracers['years'][t],2))+" years")
+        
+        masked_array = np.ma.array(np.nanmean(data.ptracers[ptracer][t,:,:,:],axis=2),\
+                                   mask=np.isnan(np.nanmean(data.ptracers[ptracer][t,:,:,:],axis=2)))
+        ca = axes.flat[ax_ind*col + 2].pcolormesh(data.Y,data.Z,masked_array,vmin = vimin, vmax = vimax, cmap=cmap,
+                                              norm = matplotlib.colors.LogNorm())
+        cbar = fig.colorbar(ca , ax=axes.flat[ax_ind*col + 2])
+        
+        ax_ind += 1 
+    fig.subplots_adjust(right=2.4,top=5.8)
 
