@@ -73,7 +73,7 @@ class RunRead:
     def readLayers(self,iters,layers_var=[ 'LaUH1TH', 'LaVH1TH' , 'LaUH2RHO' , 'LaVH2RHO' , 'LaTr2RHO' ]):
         read_layers(self,iters,layers_var)
 
-    def readDynStDiagLayers(self,iters,var_list=['LaUH1TH','LaVH1TH','LaUH2RHO','LaVH2RHO','LaHc1TH','LaHc2RHO','LaHc3SLT']):
+    def readDynStDiagLayers(self,iters,var_list=['LaUH1TH','LaVH1TH','LaUH2RHO','LaVH2RHO','LaHc1TH ','LaHc2RHO','LaHc3SLT']):
         read_dynStDiagLayers(self,iters,var_list)
 
     def readDynStDiagPtracers(self,iters):

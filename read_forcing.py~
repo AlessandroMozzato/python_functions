@@ -129,8 +129,7 @@ def dataset_unity():
     titles = {'v10m': 'Meridional wind' , 'u10m' : 'Zonal wind', 'rain_new33': 'Precipitation new33', \
             'dlw' : 'Long wave radiation' , 'dsw' : 'Short wave radiation' , 'tmp2m_degC' : 'Temperature at 2m' , \
             'spfh2m' : 'Specific humidity at 2m', 'rain': 'Precipitation'}
-    unity = {'v10m': r"$m/s$" , 'u10m' : r"$m/s$", 'rain_new33': r"$mm/day$", \
-            'dlw' : r"$W/m^2$" , 'dsw' : r"$W/m^2$" , 'tmp2m_degC' : r"$^{\circ}C$" , \
-            'spfh2m' : r"$kg/kg", 'rain': r"$mm/day$"}
+    unity = {'v10m': 'm/s' , 'u10m' : 'm/s', 'rain_new33': 'mm/day', \
+            'dlw' : 'W/m2' , 'dsw' : 'W/m2' , 'tmp2m_degC' : 'C' , \
+            'spfh2m' : 'kg/kg', 'rain': 'mm/day'}
     return titles,unity
-titles, unity = dataset_unity()
