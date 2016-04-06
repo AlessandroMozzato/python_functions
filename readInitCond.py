@@ -37,11 +37,11 @@ class Woa:
         self.lat = lat[:]*1
         lon = file2read.variables['XC']
         self.lon = lon[:]*1
-        file1 = '/scratch/general/am8e13/WOA/WOA05_THETA_JAN_210x192x50_arctic'
+        file1 = '/scratch/general/am8e13/WOA/WOA05_THETA_210x192x50_arctic'
         self.T = komod.mitbin(file1,xdim=192,ydim=210,zdim=50,datatype='float32')
         self.T = np.squeeze(self.T,axis=0)
         self.T[self.bathy == 0] = np.nan
-        file1 = '/scratch/general/am8e13/WOA/WOA05_SALT_JAN_210x192x50_arctic'
+        file1 = '/scratch/general/am8e13/WOA/WOA05_SALT_210x192x50_arctic'
         self.S = komod.mitbin(file1,xdim=192,ydim=210,zdim=50,datatype='float32')
         self.S = np.squeeze(self.S,axis=0)
         self.S[self.bathy == 0] = np.nan
@@ -51,10 +51,10 @@ class Woa:
         # calculate jmd 95 density                
         
         # 18 km files
-        file1 = '/scratch/general/am8e13/WOA/WOA05_THETA_JAN_420x384x50_arctic'
+        file1 = '/scratch/general/am8e13/WOA/WOA05_THETA_420x384x50_arctic'
         self.T18 = komod.mitbin(file1,xdim=384,ydim=420,zdim=50,datatype='float32')
         self.T18 = np.squeeze(self.T18,axis=0)
-        file1 = '/scratch/general/am8e13/WOA/WOA05_SALT_JAN_420x384x50_arctic'
+        file1 = '/scratch/general/am8e13/WOA/WOA05_SALT_420x384x50_arctic'
         self.S18 = komod.mitbin(file1,xdim=384,ydim=420,zdim=50,datatype='float32')
         self.S18 = np.squeeze(self.S18,axis=0)         
         
@@ -68,10 +68,10 @@ class Woa:
         self.rhop18 = rhop(self.S18,self.T18)
         
         # 9 km files
-        file1 = '/scratch/general/am8e13/WOA/WOA05_THETA_JAN_840x768x50_arctic'
+        file1 = '/scratch/general/am8e13/WOA/WOA05_THETA_840x768x50_arctic'
         self.T9 = komod.mitbin(file1,xdim=768,ydim=840,zdim=50,datatype='float32')
         self.T9 = np.squeeze(self.T9,axis=0)
-        file1 = '/scratch/general/am8e13/WOA/WOA05_SALT_JAN_840x768x50_arctic'
+        file1 = '/scratch/general/am8e13/WOA/WOA05_SALT_840x768x50_arctic'
         self.S9 = komod.mitbin(file1,xdim=768,ydim=840,zdim=50,datatype='float32')
         self.S9 = np.squeeze(self.S9,axis=0)         
         
