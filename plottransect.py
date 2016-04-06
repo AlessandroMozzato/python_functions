@@ -125,8 +125,7 @@ def get_transect1(lat, lon, data, lat1, lon1, lat2, lon2, npoints = 10, pdif = 1
 
 def comp_plot(data, reg,npoints=15):
     import matplotlib as mpl
-    # This function plots time evolution of temperature/salinity on a transect.                                                     
-                                                                                                                                     
+    # This function plots time evolution of temperature/salinity on a transect.                                 
     # Transect are: Fram Strait, Bering Strait ...                                                                                  
                                                                                                                
     npl = len(data)                                                                                                                  
@@ -134,10 +133,8 @@ def comp_plot(data, reg,npoints=15):
                "davis" : [66,-61,66,-53] , "arctic1" : [83,-28,74,136] , "arctic2" : [71,-139,75,53], \
                "arctic3" : [78,-115,76,111] , "arctic4" : [60,180,60,0] }
     region = regions[reg]
-    lat1 = region[0]
-    lon1 = region[1]
-    lat2 = region[2]
-    lon2 = region[3]
+    
+    lat1 = region[0] ; lon1 = region[1] ; lat2 = region[2] ; lon2 = region[3] ;
     fig, axes = plt.subplots(3,npl,sharex='col', sharey='row')
     ind = 0
 
@@ -189,17 +186,39 @@ def comp_plot(data, reg,npoints=15):
         else:
             axes.flat[ind+npl*2].contourf(x_kilometers,Z,data_prof[0:z2,:],\
                     vmin=r_min,vmax=r_max,levels = rhobounds,\
-                    extend = 'both',cmap = cmocean.cm.rho)
+                    extend = 'both',cmap = cmocean.cm.rho)                                                                                          
+        axes.flat[ind+npl*2].set_title("Dens - "+data[run].title)
+        axes.flat[ind+npl*2].title.set_fontsize('14')
+        if ind == 0:
+            axes.flat[ind+npl*2].set_ylabel(r'$m$')
+        axes.flat[ind+npl*2].set_xlabel(r'$km$')
+
+        # this is to plot ticks   
+        ax = axes.flat[ind+npl].get_xaxis()
+        ax.set_ticks(km_ticks[reg])                                                                                                            
+        ind = ind + 1
+
+    cbar_ax = fig.add_axes([2.15, 2.2, 0.045, 0.7])
+    cbar = plt.colorbar(imT, cax=cbar_ax,ticks=[-1,0,1,2,3,4,5,6,7])
+    cbar.ax.set_ylabel(r'$^{\circ}C$')
+
+    cbar_ax2 = fig.add_axes([2.15, 1.2, 0.045, 0.7])
+    cbar2 = plt.colorbar(imS, cax=cbar_ax2,ticks=[30,31,32,33,34,35])
+    cbar2.ax.set_ylabel(r'$psu$')
+
+    cbar_ax3 = fig.add_axes([2.15, 0.2, 0.045, 0.7])
+    cbar3 = plt.colorbar(imrho, cax=cbar_ax3,ticks=[26.0,26.5,27.0,27.5,28.0,28.5,29])
+    cbar3.ax.set_ylabel(r'$kg/m^3$')
+
+    fig.subplots_adjust(right=2.1,top=3.)
 
 
 def comp_diff_plot(data,diff, reg,npoints=15):
     import matplotlib as mpl
-    # This function plots time evolution of temperature/salinity on a transect.                                                      \
-                                                                                                                                      
-    # Transect are: Fram Strait, Bering Strait ...                                                                                   \
-                                                                                                                                      
-    npl = len(data)
+    # This function plots difference of temperature/salinity/density from climatologies on a transect. 
+    # Transect are: Fram Strait, Bering Strait ...                                  
     
+    npl = len(data)
     regions = {"barents" : [77,-20,79,10] , "fram" : [80,-13,79,10] , "bering" : [64,-169,67,-168] , \
                "davis" : [66,-61,66,-53] , "arctic1" : [83,-28,74,136] , "arctic2" : [71,-139,75,53], \
                "arctic3" : [78,-115,76,111] , "arctic4" : [60,180,60,0] }
@@ -244,10 +263,10 @@ def comp_diff_plot(data,diff, reg,npoints=15):
                     extend = 'both', cmap = cmocean.cm.freesurface)
         #axes.flat[ind].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = tempbounds1,\                                    
         #            extend = 'both')                                                                                                 
-        axes.flat[ind].set_title("T "+data[run].title)
+        axes.flat[ind].set_title("Diff Temp - "+data[run].title)
         axes.flat[ind].title.set_fontsize('14')
         if ind == 0:
-            axes.flat[ind].set_ylabel('m')
+            axes.flat[ind].set_ylabel(r'$m$')
 
         # plot salinity                                                                                                               
         data_prof, x_kilometers, m_grid, n_grid  = \
@@ -262,10 +281,10 @@ def comp_diff_plot(data,diff, reg,npoints=15):
                     extend = 'both' , cmap = cmocean.cm.freesurface)
         #axes.flat[ind+npl].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = saltbounds1,\                                
         #            extend = 'both')                                                                                                 
-        axes.flat[ind+npl].set_title("S "+data[run].title)
+        axes.flat[ind+npl].set_title("Diff Sal - "+data[run].title)
         axes.flat[ind+npl].title.set_fontsize('14')
         if ind == 0:
-            axes.flat[ind+npl].set_ylabel('m')
+            axes.flat[ind+npl].set_ylabel(r'$m$')
 
         # plot density                                                                                                                
         data_prof, x_kilometers, m_grid, n_grid  = \
@@ -278,31 +297,28 @@ def comp_diff_plot(data,diff, reg,npoints=15):
         else:
             axes.flat[ind+npl*2].contourf(x_kilometers,Z,data_prof[0:z2,:],\
                     vmin=r_min,vmax=r_max,levels = rhobounds,\
-                    extend = 'both',cmap = cmocean.cm.freesurface)
-        #axes.flat[ind+npl*2].contour(x_kilometers,Z,data_prof[0:z2,:],colors='k',levels = rhobounds,\                                
-        #            extend = 'both')                                                                                                 
-        axes.flat[ind+npl*2].set_title("rho "+data[run].title)
+                    extend = 'both',cmap = cmocean.cm.freesurface)                                                                                        
+        axes.flat[ind+npl*2].set_title("Dens diff. -  "+data[run].title)
         axes.flat[ind+npl*2].title.set_fontsize('14')
         if ind == 0:
-            axes.flat[ind+npl*2].set_ylabel('m')
-        axes.flat[ind+npl*2].set_xlabel('km')
-
-        #for item in ([axes.flat[ind].title, axes.flat[ind].xaxis.label, axes.flat[ind].yaxis.label]):                                                                                                                                      
-        #   item.set_fontsize(14)                                                                                                   \
-                                                                                                                                      
+            axes.flat[ind+npl*2].set_ylabel(r'$m$')
+        axes.flat[ind+npl*2].set_xlabel(r'$km$')  
+        # this is to plot ticks   
+        ax = axes.flat[ind+npl].get_xaxis()
+        ax.set_ticks(km_ticks[reg])                                                                                                                   
         ind = ind + 1
 
     cbar_ax = fig.add_axes([2.15, 2.2, 0.045, 0.7])
     cbar = plt.colorbar(imT, cax=cbar_ax,ticks=[-2,-1.5,-1,-0.5,0,0.5,1,1.5,2])
-    cbar.ax.set_ylabel('C')
+    cbar.ax.set_ylabel(r'$^{\circ}C$')
 
     cbar_ax2 = fig.add_axes([2.15, 1.2, 0.045, 0.7])
     cbar2 = plt.colorbar(imS, cax=cbar_ax2,ticks=[-2,-1.5,-1,-0.5,0,0.5,1,1.5,2])
-    cbar2.ax.set_ylabel('psu')
+    cbar2.ax.set_ylabel(r'$psu$')
 
     cbar_ax3 = fig.add_axes([2.15, 0.2, 0.045, 0.7])
     cbar3 = plt.colorbar(imrho, cax=cbar_ax3,ticks=[-2,-1.5,-1,-0.5,0,0.5,1,1.5,2])
-    cbar3.ax.set_ylabel('kg/m^3')
+    cbar3.ax.set_ylabel(r'$kg/m^3$')
 
     fig.subplots_adjust(right=2.1,top=3.)
 
