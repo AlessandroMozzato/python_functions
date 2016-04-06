@@ -16,7 +16,6 @@ from topostrophy import *
 from rho import *
 
 def grid_read(res):
-    ''' use: grid = grid_read(res) '''
     path = "/scratch/general/am8e13/results"+str(res)+"km/grid.nc"
     file2read = netcdf.NetCDFFile(path,'r')
     # Bathy is 1 on land and 0 over sea 
