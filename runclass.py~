@@ -1199,7 +1199,7 @@ def fluxTransport(data,var):
     return {'Inflow' : round(np.mean(data.fluxes[var]['FluxInSum']),2),\
             'Outflow' : round(np.mean(data.fluxes[var]['FluxOutSum']),2) ,\
             'Total flow' : round(np.mean(data.fluxes[var]['FluxSum']),2) ,\
-            'FWFlux' : round(np.mean(data.fluxes[var]['FluxSumFW']*1000),2) ,\
+            'FWFlux' : round(np.mean(data.fluxes[var]['FluxSumFW']),2) ,\
             'HFlux' : round(np.mean(data.fluxes[var]['FluxSumT']),2)}
 
 def save_flux(data,fold): 
