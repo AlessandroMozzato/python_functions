@@ -30,6 +30,8 @@ class RunRead:
                      'ke_mean' : [], 'ke_max' : [], 'ke_vol' : [],\
                      'seaice_area_max' : [], 'seaice_area_min' : [], 'seaice_area_mean' : [],\
                      'seaice_heff_max' : [], 'seaice_heff_min' : [], 'seaice_heff_mean' : [],\
+                     'seaice_hsnow_max' : [], 'seaice_hsnow_min' : [] , 'seaice_hsnow_mean' : [],\
+                     'seaice_hsalt_max' : [], 'seaice_hsalt_min' : [] ,'seaice_hsalt_mean' : [],\
                      'time_seconds' : [] , 'time_years' : [] ,\
                      'time_seconds_ice' : [],'time_years_ice' : []}
         
@@ -93,6 +95,8 @@ class RunRead:
     def readMonitorSeaiceData(self,iters):
         self.data['seaice_area_max'], self.data['seaice_area_min'], self.data['seaice_area_mean'], \
         self.data['seaice_heff_max'], self.data['seaice_heff_min'], self.data['seaice_heff_mean'], \
+        self.data['seaice_hsnow_max'], self.data['seaice_hsnow_min'], self.data['seaice_hsnow_mean'], \
+        self.data['seaice_hsalt_max'], self.data['seaice_hsalt_min'], self.data['seaice_hsalt_mean'], \
         self.data['time_seconds_ice'] = monitor_seaice(self.path,iters)
         self.data['time_years_ice'] = (self.data['time_seconds_ice']- self.data['time_seconds_ice'][0])/(360*60*60*24)
         print 'Read Seaice Monitor'
@@ -460,6 +464,9 @@ class RunRead:
                             'FluxSumFW' : np.zeros_like(self.data['T'][:,0,0,0])}
             
             S0 = 34.8 # reference salinity
+            # this is to calculate the FW flux correctly
+            tmp = np.ones_like(self.data['S'])
+            tmp[self.data['S']>S0] = 0
 
             for t in range(self.data['V'].shape[0]):
                 # Fram fillign
@@ -473,9 +480,8 @@ class RunRead:
                 self.fluxes['Fram']['FluxS'][t,:,:] = self.fluxes['Fram']['Flux'][t,:,:]*\
                                             self.data['S'][t,:,58*kk:80*kk,76*kk]
                 self.fluxes['Fram']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Fram']['FluxS'][t,:,:])) 
-                
                 self.fluxes['Fram']['FluxFW'][t,:,:] = self.fluxes['Fram']['Flux'][t,:,:]*\
-                                            (1 - self.data['S'][t,:,58*kk:80*kk,76*kk]/S0)
+                                            (1 - self.data['S'][t,:,58*kk:80*kk,76*kk]/S0)*tmp[t,:,58*kk:80*kk,76*kk]
                 self.fluxes['Fram']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Fram']['FluxFW'][t,:,:]))                 
                 
                 self.totalFluxes['Fram'] = fluxTransport(self,'Fram')
@@ -492,7 +498,7 @@ class RunRead:
                                             self.data['S'][t,:,55*kk:85*kk,78*kk]
                 self.fluxes['Fram1']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Fram1']['FluxS'][t,:,:]))  
                 self.fluxes['Fram1']['FluxFW'][t,:,:] = self.fluxes['Fram1']['Flux'][t,:,:]*\
-                                            (1 - self.data['S'][t,:,55*kk:85*kk,78*kk]/S0)
+                                            (1 - self.data['S'][t,:,55*kk:85*kk,78*kk]/S0)*tmp[t,:,55*kk:85*kk,78*kk]
                 self.fluxes['Fram1']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Fram1']['FluxFW'][t,:,:]))  
                 self.totalFluxes['Fram1'] = fluxTransport(self,'Fram1')
                 
@@ -508,7 +514,7 @@ class RunRead:
                                             self.data['S'][t,:,60*kk:83*kk,72*kk]
                 self.fluxes['Fram2']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Fram2']['FluxS'][t,:,:]))    
                 self.fluxes['Fram2']['FluxFW'][t,:,:] =self.fluxes['Fram2']['Flux'][t,:,:]*\
-                                            (1 - self.data['S'][t,:,60*kk:83*kk,72*kk]/S0)
+                                            (1 - self.data['S'][t,:,60*kk:83*kk,72*kk]/S0)*tmp[t,:,60*kk:83*kk,72*kk]
                 self.fluxes['Fram2']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Fram2']['FluxFW'][t,:,:]))    
                 self.totalFluxes['Fram2'] = fluxTransport(self,'Fram2')                    
                 
@@ -524,7 +530,7 @@ class RunRead:
                                             self.data['S'][t,:,80*kk:89*kk,178*kk]
                 self.fluxes['Bering']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Bering']['FluxS'][t,:,:]))
                 self.fluxes['Bering']['FluxFW'][t,:,:] = self.fluxes['Bering']['Flux'][t,:,:]*\
-                                            (1 - self.data['S'][t,:,80*kk:89*kk,178*kk]/S0)
+                                            (1 - self.data['S'][t,:,80*kk:89*kk,178*kk]/S0)*tmp[t,:,80*kk:89*kk,178*kk]
                 self.fluxes['Bering']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Bering']['FluxFW'][t,:,:]))
                 self.totalFluxes['Bering'] = fluxTransport(self,'Bering')
                 
@@ -540,7 +546,7 @@ class RunRead:
                                             self.data['S'][t,:,113*kk:135*kk,75*kk]
                 self.fluxes['Davis']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Davis']['FluxS'][t,:,:]))
                 self.fluxes['Davis']['FluxFW'][t,:,:] = self.fluxes['Davis']['Flux'][t,:,:]*\
-                                            (1 - self.data['S'][t,:,113*kk:135*kk,75*kk]/S0)
+                                            (1 - self.data['S'][t,:,113*kk:135*kk,75*kk]/S0)*tmp[t,:,113*kk:135*kk,75*kk]
                 self.fluxes['Davis']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Davis']['FluxFW'][t,:,:]))
                 self.totalFluxes['Davis'] = fluxTransport(self,'Davis') 
                 
@@ -556,7 +562,7 @@ class RunRead:
                                             self.data['S'][t,:,135*kk,52*kk:73*kk]
                 self.fluxes['Davis1']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Davis1']['FluxS'][t,:,:]))
                 self.fluxes['Davis1']['FluxFW'][t,:,:] = self.fluxes['Davis1']['Flux'][t,:,:]*\
-                                            (1 - self.data['S'][t,:,135*kk,52*kk:73*kk]/S0)
+                                            (1 - self.data['S'][t,:,135*kk,52*kk:73*kk]/S0)*tmp[t,:,135*kk,52*kk:73*kk]
                 self.fluxes['Davis1']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Davis1']['FluxFW'][t,:,:]))
                 self.totalFluxes['Davis1'] = fluxTransport(self,'Davis1') 
                 
@@ -572,7 +578,7 @@ class RunRead:
                                             self.data['S'][t,:,113*kk:135*kk,72*kk]
                 self.fluxes['Davis2']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Davis2']['FluxS'][t,:,:]))
                 self.fluxes['Davis2']['FluxFW'][t,:,:] = self.fluxes['Davis2']['Flux'][t,:,:]*\
-                                            (1 - self.data['S'][t,:,113*kk:135*kk,72*kk]/S0)
+                                            (1 - self.data['S'][t,:,113*kk:135*kk,72*kk]/S0)*tmp[t,:,113*kk:135*kk,72*kk]
                 self.fluxes['Davis2']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Davis2']['FluxFW'][t,:,:]))
                 self.totalFluxes['Davis2'] = fluxTransport(self,'Davis2') 
 
@@ -592,8 +598,8 @@ class RunRead:
                                             self.data['S'][t,:,40*kk:58*kk,68*kk]),axis=1)
                 self.fluxes['Barents']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Barents']['FluxS'][t,:,:]))
                 self.fluxes['Barents']['FluxFW'][t,:,:] = self.fluxes['Barents']['Flux'][t,:,:]*np.concatenate((\
-                                            (1 - self.data['S'][t,:,40*kk,53*kk:68*kk]/S0 ),\
-                                            (1 - self.data['S'][t,:,40*kk:58*kk,68*kk]/S0)),axis=1)
+                                            (1 - self.data['S'][t,:,40*kk,53*kk:68*kk]/S0 )*tmp[t,:,40*kk,53*kk:68*kk],\
+                                            (1 - self.data['S'][t,:,40*kk:58*kk,68*kk]/S0)*tmp[t,:,40*kk:58*kk,68*kk]),axis=1)
                 self.fluxes['Barents']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Barents']['FluxFW'][t,:,:]))
                 self.totalFluxes['Barents'] = fluxTransport(self,'Barents')
 
@@ -614,8 +620,8 @@ class RunRead:
                                             self.data['S'][t,:,45*kk:58*kk,66*kk]),axis=1)
                 self.fluxes['Barents1']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Barents1']['FluxS'][t,:,:]))
                 self.fluxes['Barents1']['FluxFW'][t,:,:] = self.fluxes['Barents1']['Flux'][t,:,:]*np.concatenate((\
-                                            (1 - self.data['S'][t,:,45*kk,49*kk:66*kk]/S0),\
-                                            (1 - self.data['S'][t,:,45*kk:58*kk,66*kk]/S0) ),axis=1)
+                                            (1 - self.data['S'][t,:,45*kk,49*kk:66*kk]/S0)*tmp[t,:,45*kk,49*kk:66*kk],\
+                                            (1 - self.data['S'][t,:,45*kk:58*kk,66*kk]/S0)*tmp[t,:,45*kk:58*kk,66*kk] ),axis=1)
                 self.fluxes['Barents1']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Barents1']['FluxFW'][t,:,:]))
                 self.totalFluxes['Barents1'] = fluxTransport(self,'Barents1')
                 
@@ -636,8 +642,8 @@ class RunRead:
                                             self.data['S'][t,:,45*kk:58*kk,49*kk]),axis=1)
                 self.fluxes['Barents2']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Barents2']['FluxS'][t,:,:]))
                 self.fluxes['Barents2']['FluxFW'][t,:,:] = self.fluxes['Barents2']['Flux'][t,:,:]*np.concatenate((\
-                                            (1 - self.data['S'][t,:,58*kk,49*kk:66*kk]/S0 ),\
-                                            (1 - self.data['S'][t,:,45*kk:58*kk,49*kk]/S0) ),axis=1)
+                                            (1 - self.data['S'][t,:,58*kk,49*kk:66*kk]/S0 )*tmp[t,:,58*kk,49*kk:66*kk],\
+                                            (1 - self.data['S'][t,:,45*kk:58*kk,49*kk]/S0)*tmp[t,:,45*kk:58*kk,49*kk] ),axis=1)
                 self.fluxes['Barents2']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Barents2']['FluxFW'][t,:,:]))
                 self.totalFluxes['Barents2'] = fluxTransport(self,'Barents2')
                
@@ -653,7 +659,7 @@ class RunRead:
                                             self.data['S'][t,:,100*kk,37*kk:48*kk]
                 self.fluxes['Denmark']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Denmark']['FluxS'][t,:,:]))
                 self.fluxes['Denmark']['FluxFW'][t,:,:] = self.fluxes['Denmark']['Flux'][t,:,:]*\
-                                            (1 - self.data['S'][t,:,100*kk,37*kk:48*kk]/S0)
+                                            (1 - self.data['S'][t,:,100*kk,37*kk:48*kk]/S0)*tmp[t,:,100*kk,37*kk:48*kk]
                 self.fluxes['Denmark']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Denmark']['FluxFW'][t,:,:]))
                 self.totalFluxes['Denmark'] = fluxTransport(self,'Denmark')
 
@@ -673,8 +679,8 @@ class RunRead:
                                         self.data['S'][t,:,95*kk,15*kk:30*kk]),axis=1)
                 self.fluxes['Norwice']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Norwice']['FluxS'][t,:,:]))
                 self.fluxes['Norwice']['FluxFW'][t,:,:] = self.fluxes['Norwice']['Flux'][t,:,:]*np.concatenate((\
-                                        (1 - self.data['S'][t,:,60*kk:95*kk,15*kk]/S0 ),\
-                                        (1 - self.data['S'][t,:,95*kk,15*kk:30*kk]/S0) ),axis=1)
+                                        (1 - self.data['S'][t,:,60*kk:95*kk,15*kk]/S0 )*tmp[t,:,60*kk:95*kk,15*kk],\
+                                        (1 - self.data['S'][t,:,95*kk,15*kk:30*kk]/S0)*tmp[t,:,95*kk,15*kk:30*kk] ),axis=1)
                 self.fluxes['Norwice']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Norwice']['FluxFW'][t,:,:]))
                 self.totalFluxes['Norwice'] = fluxTransport(self,'Norwice')
 
@@ -734,7 +740,8 @@ class RunRead:
         print 'Read Vorticity'
 
     def seaiceread(self,list_var):
-        self.seaice = { 'SIarea' : [] , 'SIheff' : [] , 'SIuice' : [] , 'SIvice' : [] , 'seconds' : [] , 'years_seaice' : [] }
+        self.seaice = { 'SIarea' : [] , 'SIheff' : [] , 'SIuice' : [] , 'SIvice' : [] , \
+                            'SIhsnow' : [] , 'SIhsalt' : [] , 'seconds' : [] , 'years_seaice' : [] }
         file2read = netcdf.NetCDFFile(self.path+'seaice.nc','r')
         SIarea = file2read.variables['SIarea']
         self.seaice['SIarea'] = SIarea[list_var]*1
@@ -744,6 +751,10 @@ class RunRead:
         self.seaice['SIuice'] = SIuice[list_var]*1
         SIvice = file2read.variables['SIvice']
         self.seaice['SIvice'] = SIvice[list_var]*1
+        SIhsnow = file2read.variables['SIhsnow']
+        self.seaice['SIhsnow'] = SIhsnow[list_var]*1
+        SIhsalt = file2read.variables['SIhsalt']
+        self.seaice['SIhsalt'] = SIhsalt[list_var]*1
         T = file2read.variables['T']
         self.seaice['seconds'] = T[list_var]*1
         self.seaice['years_seaice'] = self.seaice['seconds']/(60*60*24*360) - self.seaice['seconds'][0]/(60*60*24*360)
@@ -915,6 +926,12 @@ def monitor_seaice(x,iter_list):
     seaice_heff_max_tot = []
     seaice_heff_min_tot = []
     seaice_heff_mean_tot = []
+    seaice_hsnow_max_tot = []
+    seaice_hsnow_min_tot = []
+    seaice_hsnow_mean_tot = []
+    seaice_hsalt_max_tot = []
+    seaice_hsalt_min_tot = []
+    seaice_hsalt_mean_tot = []
     time_seconds_ice_tot = []
     
     for iter in iter_list:
@@ -938,7 +955,19 @@ def monitor_seaice(x,iter_list):
         seaice_heff_min = seaice_heff_min[:]*1
         seaice_heff_mean = file2read3.variables['seaice_heff_mean']
         seaice_heff_mean = seaice_heff_mean[:]*1
-        
+        seaice_hsnow_max = file2read3.variables['seaice_hsnow_max']
+        seaice_hsnow_max = seaice_hsnow_max[:]*1
+        seaice_hsnow_min = file2read3.variables['seaice_hsnow_min']
+        seaice_hsnow_min = seaice_hsnow_min[:]*1
+        seaice_hsnow_mean = file2read3.variables['seaice_hsnow_mean']
+        seaice_hsnow_mean = seaice_hsnow_mean[:]*1
+        seaice_hsalt_max = file2read3.variables['seaice_hsalt_max']
+        seaice_hsalt_max = seaice_hsalt_max[:]*1
+        seaice_hsalt_min = file2read3.variables['seaice_hsalt_min']
+        seaice_hsalt_min = seaice_hsalt_min[:]*1
+        seaice_hsalt_mean = file2read3.variables['seaice_hsalt_mean']
+        seaice_hsalt_mean = seaice_hsalt_mean[:]*1
+
         time_seconds_ice_tot = np.concatenate([time_seconds_ice_tot , time_seconds_ice])
         seaice_area_max_tot = np.concatenate([seaice_area_max_tot , seaice_area_max])
         seaice_area_min_tot = np.concatenate([seaice_area_min_tot , seaice_area_min])
@@ -946,9 +975,17 @@ def monitor_seaice(x,iter_list):
         seaice_heff_max_tot = np.concatenate([seaice_heff_max_tot , seaice_heff_max])
         seaice_heff_min_tot = np.concatenate([seaice_heff_min_tot , seaice_heff_min])
         seaice_heff_mean_tot =np.concatenate([seaice_heff_mean_tot , seaice_heff_mean])        
+        seaice_hsnow_max_tot = np.concatenate([seaice_hsnow_max_tot , seaice_hsnow_max])
+        seaice_hsnow_min_tot = np.concatenate([seaice_hsnow_min_tot , seaice_hsnow_min])
+        seaice_hsnow_mean_tot =np.concatenate([seaice_hsnow_mean_tot , seaice_hsnow_mean])
+        seaice_hsalt_max_tot = np.concatenate([seaice_hsalt_max_tot , seaice_hsalt_max])
+        seaice_hsalt_min_tot = np.concatenate([seaice_hsalt_min_tot , seaice_hsalt_min])
+        seaice_hsalt_mean_tot =np.concatenate([seaice_hsalt_mean_tot , seaice_hsalt_mean])
 
     return      seaice_area_max_tot, seaice_area_min_tot, seaice_area_mean_tot, seaice_heff_max_tot, \
-                seaice_heff_min_tot, seaice_heff_mean_tot, time_seconds_ice_tot
+                seaice_heff_min_tot, seaice_heff_mean_tot, seaice_hsnow_max_tot, seaice_hsnow_min_tot, \
+                seaice_hsnow_mean_tot, seaice_hsalt_max_tot, seaice_hsalt_min_tot, seaice_hsalt_mean_tot,\
+                time_seconds_ice_tot
 
 
 def dynStDiag(x,iter_list):
