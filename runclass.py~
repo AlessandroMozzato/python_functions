@@ -764,13 +764,6 @@ class RunRead:
         self.seaice['SIheff'][:,0,self.hfacc[0,:,:]==0] = np.nan
         self.seaice['SIuice'][:,0,self.hfacc[0,:,:]==0] = np.nan
         self.seaice['SIvice'][:,0,self.hfacc[0,:,:]==0] = np.nan
-        
-        self.seaice['SIarea'] = self.seaice['SIarea'].squeeze(axis=1)
-        self.seaice['SIheff'] = self.seaice['SIheff'].squeeze(axis=1)
-        self.seaice['SIuice'] = self.seaice['SIuice'].squeeze(axis=1)
-        self.seaice['SIvice'] = self.seaice['SIvice'].squeeze(axis=1)
-        self.seaice['SIhsnow'] =self.seaice['SIhsnow'].squeeze(axis=1)
-        self.seaice['SIhsalt'] =self.seaice['SIhsalt'].squeeze(axis=1)
         print 'Read seaice'
 
     def mxldepthread(self,list_var):

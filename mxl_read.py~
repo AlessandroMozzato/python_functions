@@ -58,3 +58,4 @@ def mxld_dic():
     mxl.lon = lons
     mxl.title = 'MIMOC'
     return mxl
+mix = mxld_dic()
