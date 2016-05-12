@@ -80,7 +80,13 @@ class RunRead:
 
     def readDynStDiagPtracers(self,iters):
         read_dynStDiagPtracers(self,iters)
-    
+
+    def readGAD(self,iters):
+        read_GAD(self,iters)
+
+    def readDynStDiagGAD(self,iters):
+        read_dynStGAD(self,iters)    
+
     def readMonitorData(self,iters):
         self.data['theta_mean'], self.data['theta_max'], self.data['theta_min'], self.data['eta_mean'],\
         self.data['eta_max'], self.data['eta_min'], self.data['salt_mean'], self.data['salt_max'],\
@@ -1415,3 +1421,87 @@ def read_dynStDiagPtracers(data,iter_list):
             for st in ['max','min','ave']:
                 var_tmp = var+tracn+'_'+st
                 data.dataDynTracers[var_tmp] = np.squeeze(data.dataDynTracers[var_tmp],axis=2)
+
+def read_GAD(data,iters,gad_var=['ADVr_TH','ADVx_TH','ADVy_TH','DFrE_TH','DFxE_TH','DFyE_TH','DFrI_TH',
+                                    'ADVr_SLT','ADVx_SLT','ADVy_SLT','DFrE_SLT','DFxE_SLT','DFyE_SLT','DFrI_SLT']):
+    
+    # This function reads generic advection diffusion diagnostics                                                   
+    data.GAD = {}
+    # read TH variables
+    file2read = netcdf.NetCDFFile(data.path+'GAD_TH.nc','r')
+    for var in gad_var[0:7]:
+        temp = file2read.variables[var]
+        data.GAD[var] = temp[iters]*1
+    temp = file2read.variables['T']
+    # read SLT variables
+    file2read = netcdf.NetCDFFile(data.path+'GAD_SLT.nc','r')
+    for var in gad_var[7:14]:
+        temp = file2read.variables[var]
+        data.GAD[var] = temp[iters]*1
+    temp = file2read.variables['T']
+    
+    data.GAD['years'] = temp[iters]*1
+    data.GAD['years'] = (data.GAD['years'] - data.GAD['years'][0] )/(60*60*24*360)
+    print 'Read '+str(gad_var)
+    file2read.close()    
+
+def read_dynStGAD(data,iter_list,var_list=['ADVr_TH','ADVx_TH','ADVy_TH','DFrE_TH','DFxE_TH','DFyE_TH',\
+                    'DFrI_TH','ADVr_SLT','ADVx_SLT','ADVy_SLT','DFrE_SLT','DFxE_SLT','DFyE_SLT','DFrI_SLT']):
+    
+    data.dataDynGAD = {}
+    # initialise variables for concatenate
+    for var in var_list:
+        for st in ['max','min','ave']:
+            var_tmp = var+'_lv_'+st
+            data.dataDynGAD[var_tmp] = np.zeros([1,7,50])
+            var_tmp = var+'_'+st
+            data.dataDynGAD[var_tmp] = np.zeros([1,7,1])
+            
+    # initialise time variables
+    data.dataDynGAD['T'] = []
+    data.dataDynGAD['years'] = []   
+    for iter in iter_list:
+        zerosto_add = '0'
+        for zeros in range(9 - len(str(iter))):
+            zerosto_add = '0'+zerosto_add
+            
+        #load Netcdf file for TH
+        file2read = netcdf.NetCDFFile(data.path+"dynStGAD_TH."+zerosto_add+str(iter)+".t001.nc",'r')  
+        for var in var_list[0:7]:
+            for st in ['max','min','ave']:
+                var_tmp = var+'_lv_'+st
+                # 2D variables
+                tmp=file2read.variables[var_tmp]
+                tmp=tmp[:]*1   
+                data.dataDynGAD[var_tmp] =np.concatenate([data.dataDynGAD[var_tmp] , tmp],axis=0)
+                # 1D variables
+                var_tmp = var+'_'+st
+                tmp=file2read.variables[var_tmp]
+                tmp=tmp[:]*1   
+                data.dataDynGAD[var_tmp] =np.concatenate([data.dataDynGAD[var_tmp] , tmp],axis=0)
+                
+        #load Netcdf file SLT
+        file2read = netcdf.NetCDFFile(data.path+"dynStGAD_SLT."+zerosto_add+str(iter)+".t001.nc",'r')
+        for var in var_list[7:14]:
+            for st in ['max','min','ave']:
+                var_tmp = var+'_lv_'+st
+                # 2D variables
+                tmp=file2read.variables[var_tmp]
+                tmp=tmp[:]*1   
+                data.dataDynGAD[var_tmp] =np.concatenate([data.dataDynGAD[var_tmp] , tmp],axis=0)
+                # 1D variables
+                var_tmp = var+'_'+st
+                tmp=file2read.variables[var_tmp]
+                tmp=tmp[:]*1   
+                data.dataDynGAD[var_tmp] =np.concatenate([data.dataDynGAD[var_tmp] , tmp],axis=0)
+        #save time variables
+        tmp = file2read.variables['T']
+        tmp=tmp[:]*1
+        data.dataDynGAD['T'] = np.concatenate([data.dataDynGAD['T'],tmp],axis=0)
+        data.dataDynGAD['years'] = np.concatenate([data.dataDynGAD['years'],tmp/(60*60*24*360)],axis=0)
+    data.dataDynGAD['years'] = data.dataDynGAD['years'] - data.dataDynGAD['years'][0]
+                
+    for var in var_list:
+        for st in ['max','min','ave']:
+            var_tmp = var+'_'+st
+            data.dataDynGAD[var_tmp] = np.squeeze(data.dataDynGAD[var_tmp],axis=2)
