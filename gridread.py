@@ -19,12 +19,12 @@ def grid_read(res):
     ''' use: grid = grid_read(res) '''
     path = "/scratch/general/am8e13/results"+str(res)+"km/grid.nc"
     file2read = netcdf.NetCDFFile(path,'r')
-    # Bathy is 1 on land and 0 over sea                                                                                                
+    # Bathy is 1 on land and 0 over sea                                                                                                       
     grid = {}
-    for var in ['HFacC','HFacW','HFacS','YC','XC','Z','Y','X','rA']:
+    for var in ['HFacC','HFacW','HFacS','YC','XC','Z','Y','X','rA','Depth']:
         temp = file2read.variables[var]
         grid[var] = temp[:]*1
-    file2read.close()        
+    file2read.close()
     area = np.zeros_like(grid['HFacC'])
     Zp = [10.00, 10.00, 10.00, 10.00, 10.00, 10.00, 10.00, 10.01,
              10.03, 10.11, 10.32, 10.80, 11.76, 13.42, 16.04 , 19.82, 24.85,

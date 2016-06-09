@@ -21,7 +21,7 @@ from literature_data import *
 from jmd95 import *
 from rho import *
 from runclass import *
-from region_mask import *
+from regions_def import *
 from gridread import *
 from basemap_plots import *
 from mxl_read import *

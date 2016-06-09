@@ -17,7 +17,7 @@ from barotropic import *
 from topostrophy import *
 from rho import *
 from jmd95 import *
-from region_mask import *
+from regions_def import *
 
 def read_mxld_data():
     file2read = netcdf.NetCDFFile('/scratch/general/am8e13/mxldepth/MIMOC_ML_v2.2_PT_S_MLP_month01.nc','r')

@@ -15,7 +15,7 @@ from barotropic import *
 from topostrophy import *
 from rho import *
 from jmd95 import *
-from region_mask import *
+from regions_def import *
 
 class RunRead:
     def __init__(self):
@@ -797,7 +797,7 @@ class RunRead:
 
         regions = reg_dic(self.res)
 
-        for i in range(4):
+        for i in range(len(regions)):
             self.mxldepth_mean[i] = np.nanmean(np.nanmean(self.mxldepth*regions[i][0,:,:],axis=1),axis=1)
             self.mxldepth_max[i] = np.nanmax(np.nanmax(self.mxldepth*regions[i][0,:,:],axis=1),axis=1)
             self.mxldepth_min[i] = np.nanmin(np.nanmin(self.mxldepth*regions[i][0,:,:],axis=1),axis=1)
