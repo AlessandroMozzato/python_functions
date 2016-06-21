@@ -8,7 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import os
 import csv
-import sys
+import sys 
 import glob
 sys.path.append('/noc/users/am8e13/Python/python_functions/')
 from barotropic import *
@@ -107,7 +107,7 @@ class RunRead:
         self.data['time_years_ice'] = (self.data['time_seconds_ice']- self.data['time_seconds_ice'][0])/(360*60*60*24)
         print 'Read Seaice Monitor'
 
-    def readDynStData(self,iters):        
+    def readDynStData(self,nrg,iters):        
         self.dataDyn['theta_mean'], self.dataDyn['theta_max'], self.dataDyn['theta_min'],\
         self.dataDyn['eta_mean'], self.dataDyn['eta_max'], self.dataDyn['eta_min'],\
         self.dataDyn['salt_mean'], self.dataDyn['salt_max'], self.dataDyn['salt_min'],\
@@ -121,7 +121,7 @@ class RunRead:
         self.dataDyn['vvel_lv_mean'], self.dataDyn['vvel_lv_max'], self.dataDyn['vvel_lv_min'], \
         self.dataDyn['uvel_lv_mean'], self.dataDyn['uvel_lv_max'], self.dataDyn['uvel_lv_min'], \
         self.dataDyn['ke_lv_mean'], self.dataDyn['ke_lv_max'],\
-        self.dataDyn['time_lv'] = dynStDiag(self.path,iters)    
+        self.dataDyn['time_lv'] = dynStDiag(self.path,nrg,iters)    
         self.dataDyn['rho_lv_mean'] = rhop(self.dataDyn['salt_lv_mean'],self.dataDyn['theta_lv_mean'])
         self.dataDyn['time_lv_years'] = (self.dataDyn['time_lv']- self.dataDyn['time_lv'][0])/(360*60*60*24)
         self.data['time_years'] = (self.data['time_seconds']- self.data['time_seconds'][0])/(360*60*60*24)
@@ -247,8 +247,6 @@ class RunRead:
         self.fluxes['years'] = temp[:]*1
 
     def fluxCalc(self):
-
-
             if self.res == 36:
                 kk = 1
             elif self.res == 18:
@@ -468,11 +466,30 @@ class RunRead:
                                         self.data['T'][:,:,60*kk:95*kk,15*kk]*Area_y[:,60*kk:95*kk,15*kk],\
                                         self.data['T'][:,:,95*kk,15*kk:30*kk]*Area_x[:,95*kk,15*kk:30*kk]),axis=2),\
                             'FluxSumFW' : np.zeros_like(self.data['T'][:,0,0,0])}
-            
+
+            self.fluxes['Norwice2'] = {'Flux' : np.concatenate((\
+                                        self.data['U'][:,:,60*kk:95*kk,25*kk]*Area_y[:,60*kk:95*kk,25*kk],\
+                                        self.data['V'][:,:,95*kk,25*kk:30*kk]*Area_x[:,95*kk,25*kk:30*kk]),axis=2),\
+                            'FluxSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
+                            'FluxInSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
+                            'FluxOutSum' : np.zeros_like(self.data['V'][:,0,0,0]),\
+                            'FluxS' : np.concatenate((\
+                                        self.data['S'][:,:,60*kk:95*kk,25*kk]*Area_y[:,60*kk:95*kk,25*kk],\
+                                        self.data['S'][:,:,95*kk,25*kk:30*kk]*Area_x[:,95*kk,25*kk:30*kk]),axis=2),\
+                            'FluxSumS' : np.zeros_like(self.data['S'][:,0,0,0]),\
+                            'FluxT' : np.concatenate((\
+                                        self.data['T'][:,:,60*kk:95*kk,25*kk]*Area_y[:,60*kk:95*kk,25*kk],\
+                                        self.data['T'][:,:,95*kk,25*kk:30*kk]*Area_x[:,95*kk,25*kk:30*kk]),axis=2),\
+                            'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0]),
+                            'FluxFW' : np.concatenate((\
+                                        self.data['T'][:,:,60*kk:95*kk,25*kk]*Area_y[:,60*kk:95*kk,25*kk],\
+                                        self.data['T'][:,:,95*kk,25*kk:30*kk]*Area_x[:,95*kk,25*kk:30*kk]),axis=2),\
+                            'FluxSumFW' : np.zeros_like(self.data['T'][:,0,0,0])}
+
             S0 = 34.8 # reference salinity
             # this is to calculate the FW flux correctly
             tmp = np.ones_like(self.data['S'])
-            tmp[self.data['S']>S0] = 0
+            tmp[:,31:,:,:] = 0
 
             for t in range(self.data['V'].shape[0]):
                 # Fram fillign
@@ -689,6 +706,28 @@ class RunRead:
                                         (1 - self.data['S'][t,:,95*kk,15*kk:30*kk]/S0)*tmp[t,:,95*kk,15*kk:30*kk] ),axis=1)
                 self.fluxes['Norwice']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Norwice']['FluxFW'][t,:,:]))
                 self.totalFluxes['Norwice'] = fluxTransport(self,'Norwice')
+
+                # Norwey-Iceland strait filling                                                                                                                                
+                self.fluxes['Norwice2']['Flux'][t,:,:] = np.concatenate((\
+                                        self.data['V'][t,:,60*kk:95*kk,25*kk]*Area_y[:,60*kk:95*kk,25*kk]/10**6,\
+                                        self.data['U'][t,:,95*kk,25*kk:30*kk]*Area_x[:,95*kk,25*kk:30*kk]/10**6),axis=1)
+                self.fluxes['Norwice2']['FluxSum'][t] = np.nansum(np.nansum(self.fluxes['Norwice2']['Flux'][t,:,:]))
+                self.fluxes['Norwice2']['FluxInSum'][t] = np.nansum(np.nansum(self.fluxes['Norwice2']['Flux'][t,self.fluxes['Norwice2']['Flux'][t,:,:]>0]))
+                self.fluxes['Norwice2']['FluxOutSum'][t] = np.nansum(np.nansum(self.fluxes['Norwice2']['Flux'][t,self.fluxes['Norwice2']['Flux'][t,:,:]<0]))
+                self.fluxes['Norwice2']['FluxT'][t,:,:] = self.fluxes['Norwice2']['Flux'][t,:,:]*np.concatenate((\
+                                        self.data['T'][t,:,60*kk:95*kk,25*kk],\
+                                        self.data['T'][t,:,95*kk,25*kk:30*kk]),axis=1)
+                self.fluxes['Norwice2']['FluxSumT'][t] = np.nansum(np.nansum(self.fluxes['Norwice2']['FluxT'][t,:,:]))
+                self.fluxes['Norwice2']['FluxS'][t,:,:] = self.fluxes['Norwice2']['Flux'][t,:,:]*np.concatenate((\
+                                        self.data['S'][t,:,60*kk:95*kk,25*kk],\
+                                        self.data['S'][t,:,95*kk,25*kk:30*kk]),axis=1)
+                self.fluxes['Norwice2']['FluxSumS'][t] = np.nansum(np.nansum(self.fluxes['Norwice2']['FluxS'][t,:,:]))
+                self.fluxes['Norwice2']['FluxFW'][t,:,:] = self.fluxes['Norwice2']['Flux'][t,:,:]*np.concatenate((\
+                                        (1 - self.data['S'][t,:,60*kk:95*kk,25*kk]/S0 )*tmp[t,:,60*kk:95*kk,25*kk],\
+                                        (1 - self.data['S'][t,:,95*kk,25*kk:30*kk]/S0)*tmp[t,:,95*kk,25*kk:30*kk] ),axis=1)
+                self.fluxes['Norwice2']['FluxSumFW'][t] = np.nansum(np.nansum(self.fluxes['Norwice2']['FluxFW'][t,:,:]))
+                self.totalFluxes['Norwice2'] = fluxTransport(self,'Norwice2')
+
 
     def baroCalc(self):
         self.psi = baro_stream(self.data['U'])
@@ -1001,48 +1040,48 @@ def monitor_seaice(x,iter_list):
                 time_seconds_ice_tot
 
 
-def dynStDiag(x,iter_list):
-    theta_mean_tot =np.zeros([1,7,1])
-    theta_max_tot =np.zeros([1,7,1])
-    theta_min_tot =np.zeros([1,7,1])
-    eta_mean_tot =np.zeros([1,7,1])
-    eta_max_tot =np.zeros([1,7,1])
-    eta_min_tot =np.zeros([1,7,1])
-    salt_mean_tot =np.zeros([1,7,1])
-    salt_max_tot =np.zeros([1,7,1])
-    salt_min_tot =np.zeros([1,7,1])
+def dynStDiag(x,nrg,iter_list):
+    theta_mean_tot =np.zeros([1,nrg,1])
+    theta_max_tot =np.zeros([1,nrg,1])
+    theta_min_tot =np.zeros([1,nrg,1])
+    eta_mean_tot =np.zeros([1,nrg,1])
+    eta_max_tot =np.zeros([1,nrg,1])
+    eta_min_tot =np.zeros([1,nrg,1])
+    salt_mean_tot =np.zeros([1,nrg,1])
+    salt_max_tot =np.zeros([1,nrg,1])
+    salt_min_tot =np.zeros([1,nrg,1])
     sss_mean_tot = [] 
     sss_max_tot =[]
     sss_min_tot =[]
     sst_mean_tot =[]
     sst_max_tot =[]
     sst_min_tot =[]
-    vvel_mean_tot =np.zeros([1,7,1])
-    vvel_max_tot =np.zeros([1,7,1])
-    vvel_min_tot =np.zeros([1,7,1])
-    uvel_mean_tot =np.zeros([1,7,1])
-    uvel_max_tot =np.zeros([1,7,1])
-    uvel_min_tot =np.zeros([1,7,1])
-    ke_mean_tot =np.zeros([1,7,1])
-    ke_max_tot =np.zeros([1,7,1])
-    ke_vol_tot =np.zeros([1,7,1])
+    vvel_mean_tot =np.zeros([1,nrg,1])
+    vvel_max_tot =np.zeros([1,nrg,1])
+    vvel_min_tot =np.zeros([1,nrg,1])
+    uvel_mean_tot =np.zeros([1,nrg,1])
+    uvel_max_tot =np.zeros([1,nrg,1])
+    uvel_min_tot =np.zeros([1,nrg,1])
+    ke_mean_tot =np.zeros([1,nrg,1])
+    ke_max_tot =np.zeros([1,nrg,1])
+    ke_vol_tot =np.zeros([1,nrg,1])
     time_seconds_tot = []
     
     # This script is meant to read dynStDiag files
-    theta_lv_mean_tot =np.zeros([1,7,50])
-    theta_lv_max_tot =np.zeros([1,7,50])
-    theta_lv_min_tot =np.zeros([1,7,50])
-    salt_lv_mean_tot =np.zeros([1,7,50])
-    salt_lv_max_tot =np.zeros([1,7,50])
-    salt_lv_min_tot =np.zeros([1,7,50])
-    vvel_lv_mean_tot =np.zeros([1,7,50])
-    vvel_lv_max_tot =np.zeros([1,7,50])
-    vvel_lv_min_tot =np.zeros([1,7,50])
-    uvel_lv_mean_tot =np.zeros([1,7,50])
-    uvel_lv_max_tot =np.zeros([1,7,50])
-    uvel_lv_min_tot =np.zeros([1,7,50])
-    ke_lv_mean_tot =np.zeros([1,7,50])
-    ke_lv_max_tot =np.zeros([1,7,50])
+    theta_lv_mean_tot =np.zeros([1,nrg,50])
+    theta_lv_max_tot =np.zeros([1,nrg,50])
+    theta_lv_min_tot =np.zeros([1,nrg,50])
+    salt_lv_mean_tot =np.zeros([1,nrg,50])
+    salt_lv_max_tot =np.zeros([1,nrg,50])
+    salt_lv_min_tot =np.zeros([1,nrg,50])
+    vvel_lv_mean_tot =np.zeros([1,nrg,50])
+    vvel_lv_max_tot =np.zeros([1,nrg,50])
+    vvel_lv_min_tot =np.zeros([1,nrg,50])
+    uvel_lv_mean_tot =np.zeros([1,nrg,50])
+    uvel_lv_max_tot =np.zeros([1,nrg,50])
+    uvel_lv_min_tot =np.zeros([1,nrg,50])
+    ke_lv_mean_tot =np.zeros([1,nrg,50])
+    ke_lv_max_tot =np.zeros([1,nrg,50])
     time_lv_tot = []
     
     for iter in iter_list:
@@ -1085,20 +1124,20 @@ def dynStDiag(x,iter_list):
         
         # option added to make the old spinup readable
         if theta_mean_lv.shape[1] == 1:
-            theta_mean_lv = np.tile(theta_mean_lv,(1,7,1))
-            theta_max_lv = np.tile(theta_max_lv,(1,7,1))
-            theta_min_lv = np.tile(theta_min_lv,(1,7,1))
-            salt_mean_lv = np.tile(salt_mean_lv,(1,7,1))
-            salt_max_lv = np.tile(salt_max_lv,(1,7,1))
-            salt_min_lv = np.tile(salt_min_lv,(1,7,1))
-            vvel_mean_lv = np.tile(vvel_mean_lv,(1,7,1))
-            vvel_max_lv = np.tile(vvel_max_lv,(1,7,1))
-            vvel_min_lv = np.tile(vvel_min_lv,(1,7,1))
-            uvel_mean_lv = np.tile(uvel_mean_lv,(1,7,1))
-            uvel_max_lv = np.tile(uvel_max_lv,(1,7,1))
-            uvel_min_lv = np.tile(uvel_min_lv,(1,7,1))
-            ke_mean_lv = np.tile(ke_mean_lv,(1,7,1))
-            ke_max_lv = np.tile(ke_max_lv,(1,7,1))
+            theta_mean_lv = np.tile(theta_mean_lv,(1,nrg,1))
+            theta_max_lv = np.tile(theta_max_lv,(1,nrg,1))
+            theta_min_lv = np.tile(theta_min_lv,(1,nrg,1))
+            salt_mean_lv = np.tile(salt_mean_lv,(1,nrg,1))
+            salt_max_lv = np.tile(salt_max_lv,(1,nrg,1))
+            salt_min_lv = np.tile(salt_min_lv,(1,nrg,1))
+            vvel_mean_lv = np.tile(vvel_mean_lv,(1,nrg,1))
+            vvel_max_lv = np.tile(vvel_max_lv,(1,nrg,1))
+            vvel_min_lv = np.tile(vvel_min_lv,(1,nrg,1))
+            uvel_mean_lv = np.tile(uvel_mean_lv,(1,nrg,1))
+            uvel_max_lv = np.tile(uvel_max_lv,(1,nrg,1))
+            uvel_min_lv = np.tile(uvel_min_lv,(1,nrg,1))
+            ke_mean_lv = np.tile(ke_mean_lv,(1,nrg,1))
+            ke_max_lv = np.tile(ke_max_lv,(1,nrg,1))
             
         theta_lv_mean_tot =np.concatenate([theta_lv_mean_tot , theta_mean_lv],axis=0)
         theta_lv_max_tot =np.concatenate([theta_lv_max_tot , theta_max_lv])
@@ -1158,24 +1197,24 @@ def dynStDiag(x,iter_list):
 
         # This is to make old spinup readable
         if theta_mean.shape[1] == 1:                                                                                                   
-            theta_mean=np.tile(theta_mean,(1,7,1))
-            theta_max=np.tile(theta_max,(1,7,1))
-            theta_min=np.tile(theta_min,(1,7,1))
-            salt_mean=np.tile(salt_mean,(1,7,1))
-            salt_max=np.tile(salt_max,(1,7,1))
-            salt_min=np.tile(salt_min,(1,7,1))
-            eta_mean=np.tile(eta_mean,(1,7,1))
-            eta_max=np.tile(eta_max,(1,7,1))
-            eta_min=np.tile(eta_min,(1,7,1))
-            uvel_mean=np.tile(uvel_mean,(1,7,1))
-            uvel_max=np.tile(uvel_max,(1,7,1))
-            uvel_min=np.tile(uvel_min,(1,7,1))
-            vvel_mean=np.tile(vvel_mean,(1,7,1))
-            vvel_max=np.tile(vvel_max,(1,7,1))
-            vvel_min=np.tile(vvel_min,(1,7,1))
-            ke_mean=np.tile(ke_mean,(1,7,1))
-            ke_max=np.tile(ke_max,(1,7,1))
-            ke_vol=np.tile(ke_vol,(1,7,1))                                                                          
+            theta_mean=np.tile(theta_mean,(1,nrg,1))
+            theta_max=np.tile(theta_max,(1,nrg,1))
+            theta_min=np.tile(theta_min,(1,nrg,1))
+            salt_mean=np.tile(salt_mean,(1,nrg,1))
+            salt_max=np.tile(salt_max,(1,nrg,1))
+            salt_min=np.tile(salt_min,(1,nrg,1))
+            eta_mean=np.tile(eta_mean,(1,nrg,1))
+            eta_max=np.tile(eta_max,(1,nrg,1))
+            eta_min=np.tile(eta_min,(1,nrg,1))
+            uvel_mean=np.tile(uvel_mean,(1,nrg,1))
+            uvel_max=np.tile(uvel_max,(1,nrg,1))
+            uvel_min=np.tile(uvel_min,(1,nrg,1))
+            vvel_mean=np.tile(vvel_mean,(1,nrg,1))
+            vvel_max=np.tile(vvel_max,(1,nrg,1))
+            vvel_min=np.tile(vvel_min,(1,nrg,1))
+            ke_mean=np.tile(ke_mean,(1,nrg,1))
+            ke_max=np.tile(ke_max,(1,nrg,1))
+            ke_vol=np.tile(ke_vol,(1,nrg,1))                                                                          
  
         time_seconds_tot =np.concatenate([time_seconds_tot , time_seconds])
         theta_mean_tot =np.concatenate([theta_mean_tot , theta_mean])
