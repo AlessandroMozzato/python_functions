@@ -28,7 +28,7 @@ def region_mask(res):
     mask3[:,50*k:90*k,0:25*k] = 1 ;
     mask3[:,90*k:100*k,0:30*k] =1 ;
     
-    # mask 4 : Norwegian
+    # mask 4 : Lofoten
     mask4 = np.zeros([nz,ny,nx]) ;
     mask4[:,:,:] = np.nan
     mask4[:,58*k:79*k,23*k:38*k] = 1
@@ -38,7 +38,7 @@ def region_mask(res):
     mask5[:,:,:] = np.nan
     mask5[:,60*k:80*k,52*k:65*k] = 1
     
-    # mask 6 : Lofoten
+    # mask 6 : Norwegian
     mask6 = np.zeros([nz,ny,nx]) ;
     mask6[:,:,:] = np.nan
     mask6[:,52*k:67*k,40*k:52*k] = 1    
@@ -62,8 +62,8 @@ def reg_dic(res):
     return regions
 
 def reg_titles():
-    region_titles = {0 : 'Global' , 1 : 'Arctic' , 2 : 'Nord Seas' , 3 : 'North Atl', 4: 'Norwegian' ,\
-                     5: 'Greenland' , 6 : 'Lofoten' , 7 : 'Iceland Sea' , 8 : 'Labrador'}
+    region_titles = {0 : 'Global' , 1 : 'Arctic' , 2 : 'Nord Seas' , 3 : 'North Atl', 4: 'Lofoten' ,\
+                     5: 'Greenland' , 6 : 'Norwegian' , 7 : 'Iceland Sea' , 8 : 'Labrador'}
     return region_titles
 
 def mask(reg,res):

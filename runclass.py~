@@ -378,7 +378,7 @@ class RunRead:
                             'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0]),\
                             'FluxFW' : np.zeros_like(self.data['T'][:,:,135*kk,52*kk:73*kk]),\
                             'FluxSumFW' : np.zeros_like(self.data['T'][:,0,0,0]),\
-                            'FluxFW1' : np.zeros_like(self.data['T'][:,:,135*kk,52*kk:73*kk]),\
+                            'FluxFW1' : np.zeros_like(self.data['T'][:,:,135*kk:52*kk,73*kk]),\
                             'FluxSumFW1' : np.zeros_like(self.data['T'][:,0,0,0]),\
                             'FluxTop' : [], 'FluxMid' : [] , 'FluxBot' : [], \
                             'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
@@ -410,7 +410,7 @@ class RunRead:
                             'FluxSumT' : np.zeros_like(self.data['T'][:,0,0,0]),\
                             'FluxFW' : np.zeros_like(self.data['T'][:,:,100*kk,37*kk:48*kk]),\
                             'FluxSumFW' : np.zeros_like(self.data['T'][:,0,0,0]),\
-                            'FluxFW1' : np.zeros_like(self.data['T'][:,:,100*kk,37*kk:48*kk]),\
+                            'FluxFW1' : np.zeros_like(self.data['T'][:,:,100*kk:37*kk,48*kk]),\
                             'FluxSumFW1' : np.zeros_like(self.data['T'][:,0,0,0]),\
                             'FluxTop' : [], 'FluxMid' : [] , 'FluxBot' : [], \
                             'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
