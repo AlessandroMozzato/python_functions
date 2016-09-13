@@ -86,3 +86,8 @@ def mask(reg,res):
         return mask8
     else:
         print "Error: invalid mask number"
+
+def reg_names():
+    region_names = {0: 'global', 1: 'arctic', 2: 'nordseas',3: 'northatl',4: 'norwegian',\
+             5: 'greenland',6: 'lofoten',7: 'icelandsea',8: 'labrador'}
+    return region_names
