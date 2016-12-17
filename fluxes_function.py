@@ -128,6 +128,8 @@ def fluxesCalculation(run):
                             'FluxSumFW' : np.zeros_like(run.data['T'][:,0,0,0]),\
                             'FluxFW1' : np.zeros_like(run.data['T'][:,:,coord[0]:coord[1],coord[2]:coord[3]]),\
                             'FluxSumFW1' : np.zeros_like(run.data['T'][:,0,0,0]),\
+                            'FluxOverFlow' : np.zeros_like(run.data['T'][:,:,coord[0]:coord[1],coord[2]:coord[3]]),\
+                            'FluxSumOverFlow' : np.zeros_like(run.data['T'][:,0,0,0]),\
                             'FluxTop' : [], 'FluxMid' : [] , 'FluxBot' : [], \
                             'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
                             'FluxTopT' : [], 'FluxMidT' : [] , 'FluxBotT' : []}
@@ -136,6 +138,9 @@ def fluxesCalculation(run):
     # this is to calculate the FW flux correctly
     tmp = np.ones_like(run.data['S'])
     tmp[:,31:,:,:] = 0
+    rho0 = 1027.8
+    tmpof = np.zeros_like(run.data['S'])
+    tmpof[run.data['rhop']>rho0] = 1
 
     # this is to calculate the FW flux correctly
     tmp1 = np.ones_like(run.data['S'])
@@ -162,6 +167,8 @@ def fluxesCalculation(run):
             run.fluxes2[var]['FluxFW1'][t,:,:] = run.fluxes2[var]['Flux'][t,:,:]*\
                     (1 - run.data['S'][t,:,coord[0]:coord[1],coord[2]:coord[3]]/S0)*tmp1[t,:,coord[0]:coord[1],coord[2]:coord[3]]
             run.fluxes2[var]['FluxSumFW1'][t] = np.nansum(np.nansum(run.fluxes2[var]['FluxFW1'][t,:,:]))   
-        
-        for flux in ['Flux','FluxT','FluxS','FluxFW','FluxFW1']:
+            run.fluxes2[var]['FluxOverFlow'][t,:,:] = run.fluxes2[var]['Flux'][t,:,:]*tmpof[t,:,coord[0]:coord[1],coord[2]:coord[3]]
+            run.fluxes2[var]['FluxSumOverFlow'][t] = np.nansum(np.nansum(run.fluxes2[var]['FluxOverFlow'][t,:,:]))  
+
+        for flux in ['Flux','FluxT','FluxS','FluxFW','FluxFW1','FluxOverFlow']:
             run.fluxes2[var][flux] = np.squeeze(run.fluxes2[var][flux],axis=ax_d[var])

@@ -19,7 +19,7 @@ def density_calc(run):
         run.data['rhop'][t,:,:,:] = rhop(run.data['S'][t,:,:,:],run.data['T'][t,:,:,:])
 
 # calculation of fluxes including 
-def fluxesCalculation(run):
+def fluxesCalculation2(run):
     kdic = {36:1,18:2,9:4}
     kk = kdic[run.res]
 
@@ -119,7 +119,7 @@ def fluxesCalculation(run):
             run.fluxes2[var]['FluxSumFW1'][t] = np.nansum(np.nansum(run.fluxes2[var]['FluxFW1'][t,:,:]))   
             run.fluxes2[var]['FluxOverFlow'][t,:,:] = run.fluxes2[var]['Flux'][t,:,:]*tmpof[t,:,coord[0]:coord[1],coord[2]:coord[3]]
             run.fluxes2[var]['FluxSumOverFlow'][t] = np.nansum(np.nansum(run.fluxes2[var]['FluxOverFlow'][t,:,:]))  
-            
+            print 'overflow saved'
         for flux in ['Flux','FluxT','FluxS','FluxFW','FluxFW1','FluxOverFlow']:
             run.fluxes2[var][flux] = np.squeeze(run.fluxes2[var][flux],axis=ax_d[var])
 

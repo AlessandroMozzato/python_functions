@@ -16,6 +16,7 @@ from topostrophy import *
 from rho import *
 from jmd95 import *
 from regions_def import *
+from gridread import *
 
 class RunRead:
     def __init__(self):
@@ -826,14 +827,26 @@ class RunRead:
 
 
     def baroCalc(self):
+        grid = grid_read(self.res)
+        mask1,mask2,mask3,mask4,mask5,mask6,mask7,mask8 = region_mask(self.res)
+        mask0 = np.ones_like(mask1)
+        areamasks = {0:mask0 , 1 : mask1 , 2 : mask2 , 3 : mask3, \
+                    4 : mask4, 5 : mask5, 6 : mask6, 7: mask7, 8 : mask8}
         self.psi = baro_stream(self.data['U'])
-        self.psi_mean = np.nanmean(self.psi,axis = 1)
-        self.psi_mean = np.nanmean(self.psi_mean,axis = 1)
-        self.psi_max = np.nanmax(self.psi,axis=1)
-        self.psi_max = np.nanmax(self.psi_max,axis=1)
-        self.psi_min = np.nanmin(self.psi,axis=1)
-        self.psi_min = np.nanmin(self.psi_min,axis=1)
-        self.psi_ave = np.nanmean(self.psi,axis=0)
+        
+        self.psi_min = np.zeros([self.psi.shape[0],len(reg_titles())])
+        self.psi_max = np.zeros([self.psi.shape[0],len(reg_titles())])
+        self.psi_mean = np.zeros([self.psi.shape[0],len(reg_titles())])
+
+        for j in range(len(reg_titles())):
+            maskcalc = np.tile(areamasks[j][0,:,:],(self.psi.shape[0],1,1))
+            data = np.array(self.psi[:,:,0:self.psi.shape[2]-1])*maskcalc
+            tmp = np.nanmean(self.psi,axis = 1)
+            self.psi_mean[:,j] = np.nanmean(tmp,axis = 1)
+            tmp = np.nanmax(self.psi,axis = 1)
+            self.psi_max[:,j] = np.nanmax(tmp,axis = 1)
+            tmp = np.nanmin(self.psi,axis = 1)
+            self.psi_min[:,j] = np.nanmin(tmp,axis = 1)
 
     # We save the barotropic streamfunction
     def savepsi(self,fold):
