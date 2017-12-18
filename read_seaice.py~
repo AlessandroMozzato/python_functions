@@ -33,9 +33,9 @@ def read_seaicedata():
     nsidc.lat = temp[:]*1
     temp = file2read.variables['lon']
     nsidc.lon = temp[:]*1 
-    med = np.zeros([12,nsidc.seaice['SIarea'].shape[1],nsidc.seaice['SIarea'].shape[2]])
+    med = np.zeros([12,nsdic.seaice['SIarea'].shape[1],nsdic.seaice['SIarea'].shape[2]])
     for j in range(12):
-        med[j,:,:] = np.nanmean(nsidc.seaice['SIarea'][j::12,:,:],axis=0)
+        med[j,:,:] = np.nanmean(nsdic.seaice['SIarea'][j::12,:,:],axis=0)
     nsidc.seaice['SIarea'] = med
 
     return nsidc

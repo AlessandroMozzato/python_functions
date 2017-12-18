@@ -841,11 +841,11 @@ class RunRead:
         for j in range(len(reg_titles())):
             maskcalc = np.tile(areamasks[j][0,:,:],(self.psi.shape[0],1,1))
             data = np.array(self.psi[:,:,0:self.psi.shape[2]-1])*maskcalc
-            tmp = np.nanmean(self.psi,axis = 1)
+            tmp = np.nanmean(data,axis = 1)
             self.psi_mean[:,j] = np.nanmean(tmp,axis = 1)
-            tmp = np.nanmax(self.psi,axis = 1)
+            tmp = np.nanmax(data,axis = 1)
             self.psi_max[:,j] = np.nanmax(tmp,axis = 1)
-            tmp = np.nanmin(self.psi,axis = 1)
+            tmp = np.nanmin(data,axis = 1)
             self.psi_min[:,j] = np.nanmin(tmp,axis = 1)
 
     # We save the barotropic streamfunction
