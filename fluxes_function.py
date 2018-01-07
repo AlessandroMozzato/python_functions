@@ -92,12 +92,14 @@ def fluxesCalculation(run):
     Area_x[hfacc==0]=np.nan
     Area_y[hfacc==0]=np.nan
     
-    coords = {}
+    coords = {} [50,95,15,15]
     coords = {'Fram': [58,80,76,76], 'Fram1' : [55,85,78,78] , 'Fram2' : [60,83,72,72] , 'Denmark': [100,100,37,48] , \
-             'Bering' : [80,89,178,178] , 'Davis' : [113,135,75,75] , 'Davis1' : [135,135,52,73] , 'Davis2' : [113,135,75,75]}
-    ax_d = {'Fram': 3, 'Fram1' : 3 , 'Fram2' : 3 , 'Denmark': 2 , 'Bering' : 3 , 'Davis' : 3 , 'Davis1' : 2 , 'Davis2' : 3}
+             'Bering' : [80,89,178,178] , 'Davis' : [113,135,75,75] , 'Davis1' : [135,135,52,73] , 'Davis2' : [113,135,75,75],\
+             'Norwice' : [50,95,15,15], 'Norwice2' : [60,95,25,25]} 
+    ax_d = {'Fram': 3, 'Fram1' : 3 , 'Fram2' : 3 , 'Denmark': 2 , 'Bering' : 3 , \
+            'Davis' : 3 , 'Davis1' : 2 , 'Davis2' : 3, 'Norwice': 3, 'Norwice2' : 3}
     vel = {'Fram': 'U', 'Fram1' : 'V' , 'Fram2' : 'V' , 'Denmark': 'U' , \
-             'Bering' : 'V' , 'Davis' : 'U' , 'Davis1' : 'U' , 'Davis2' : 'U' }
+             'Bering' : 'V' , 'Davis' : 'U' , 'Davis1' : 'U' , 'Davis2' : 'U','Norwice':'V','Norwice2':'V' }
     
     def coord_calc(coord):
         if coord[0] == coord[1]:
@@ -113,7 +115,7 @@ def fluxesCalculation(run):
         return coord
 
     run.fluxes2 = {}
-    for var in ['Fram','Fram1','Fram2','Denmark','Bering','Davis','Davis1','Davis2']:
+    for var in ['Fram','Fram1','Fram2','Denmark','Bering','Davis','Davis1','Davis2','Norwice','Norwice2']:
         coord = coords[var]
         coord = coord_calc(coord)
         run.fluxes2[var] = {'Flux' : np.zeros_like(run.data[vel[var]][:,:,coord[0]:coord[1],coord[2]:coord[3]]),\
@@ -172,3 +174,135 @@ def fluxesCalculation(run):
 
         for flux in ['Flux','FluxT','FluxS','FluxFW','FluxFW1','FluxOverFlow']:
             run.fluxes2[var][flux] = np.squeeze(run.fluxes2[var][flux],axis=ax_d[var])
+            
+def fluxesCalculation_allin(run,times):
+    kdic = {36:1,18:2,9:4}
+    kk = kdic[run.res]
+
+    file2read = netcdf.NetCDFFile('/scratch/general/am8e13/results'+str(run.res)+'km/grid.nc','r')
+    hfacc = file2read.variables['HFacC']
+    hfacc = hfacc[:]*1
+    drf = file2read.variables['drF']
+    drf = drf[:]*1
+    rA = file2read.variables['rA']
+    rA = rA[:]*1
+    dyF = file2read.variables['dyF']
+    dyF = dyF[:]*1
+    dxF = file2read.variables['dxF']
+    dxF = dxF[:]*1
+    dydx = np.zeros_like(hfacc)
+    for k in range(len(drf)):
+        dydx[k,:,:] = drf[k]*rA*hfacc[k,:,:]
+    Area_x = dydx/dxF
+    Area_y = dydx/dyF
+    Area_x[hfacc==0]=np.nan
+    Area_y[hfacc==0]=np.nan
+    
+    coords = {'Fram': [58,80,76,76], 'Fram1' : [55,85,78,78] , 'Fram2' : [60,83,72,72] , \
+              'Denmark': [100,100,37,48] , 'Bering' : [80,89,178,178] , 'Davis' : [113,135,75,75] ,\
+              'Davis1' : [135,135,52,73] , 'Davis2' : [113,135,75,75],\
+             'Norwice' : [50,95,15,15], 'Norwice2' : [60,95,25,25]} 
+    ax_d = {'Fram': 3, 'Fram1' : 3 , 'Fram2' : 3 , 'Denmark': 2 , 'Bering' : 3 , \
+            'Davis' : 3 , 'Davis1' : 2 , 'Davis2' : 3, 'Norwice': 3, 'Norwice2' : 3}
+    vel = {'Fram': 'U', 'Fram1' : 'V' , 'Fram2' : 'V' , 'Denmark': 'U' , \
+             'Bering' : 'V' , 'Davis' : 'U' , 'Davis1' : 'U' , 'Davis2' : 'U','Norwice':'V','Norwice2':'V' }
+    
+    def coord_calc(coord):
+        if coord[0] == coord[1]:
+            coord[0] = coord[0]*kk
+            coord[1] = coord[0]+1
+            coord[2] = coord[2]*kk
+            coord[3] = coord[3]*kk
+        elif coord[2] == coord[3]:
+            coord[0] = coord[0]*kk
+            coord[1] = coord[1]*kk
+            coord[2] = coord[2]*kk
+            coord[3] = coord[2]+1
+        return coord
+
+    run.fluxes2 = {}
+    file2read = netcdf.NetCDFFile('/scratch/general/am8e13/results18km/grid.nc','r')
+    mask = file2read.variables['HFacC']
+    mask = mask[:]*1
+    mask = np.tile(mask,(len(times),1,1,1))
+    
+    for var in ['Fram','Fram1','Fram2','Denmark','Bering','Davis','Davis1','Davis2','Norwice','Norwice2']:
+        coord = coords[var]
+        coord = coord_calc(coord)
+        run.fluxes2[var] = {'Flux' : np.zeros_like(mask[:,:,coord[0]:coord[1],coord[2]:coord[3]]),\
+                            'FluxSum' : np.zeros_like(mask[:,0,0,0]),\
+                            'FluxInSum' : np.zeros_like(mask[:,0,0,0]),\
+                            'FluxOutSum' : np.zeros_like(mask[:,0,0,0]),\
+                            'FluxS' : np.zeros_like(mask[:,:,coord[0]:coord[1],coord[2]:coord[3]]),\
+                            'FluxSumS' : np.zeros_like(mask[:,0,0,0]),\
+                            'FluxT' : np.zeros_like(mask[:,:,coord[0]:coord[1],coord[2]:coord[3]]),\
+                            'FluxSumT' : np.zeros_like(mask[:,0,0,0]),\
+                            'FluxFW' : np.zeros_like(mask[:,:,coord[0]:coord[1],coord[2]:coord[3]]),\
+                            'FluxSumFW' : np.zeros_like(mask[:,0,0,0]),\
+                            'FluxFW1' : np.zeros_like(mask[:,:,coord[0]:coord[1],coord[2]:coord[3]]),\
+                            'FluxSumFW1' : np.zeros_like(mask[:,0,0,0]),\
+                            'FluxOverFlow' : np.zeros_like(mask[:,:,coord[0]:coord[1],coord[2]:coord[3]]),\
+                            'FluxSumOverFlow' : np.zeros_like(mask[:,0,0,0]),\
+                            'FluxTop' : [], 'FluxMid' : [] , 'FluxBot' : [], \
+                            'FluxTopS' : [], 'FluxMidS' : [] , 'FluxBotS' : [], \
+                            'FluxTopT' : [], 'FluxMidT' : [] , 'FluxBotT' : []}
+        
+    S0 = 34.8
+    rho0 = 1027.8
+
+    for t,tt in enumerate(times):
+        file2read = netcdf.NetCDFFile(run.path+'state.nc','r')
+        S = file2read.variables['S']
+        S = S[tt]*1
+        T = file2read.variables['Temp']
+        T = T[tt]*1
+        vels = {}
+        vels['U'] = file2read.variables['U']
+        vels['U'] = vels['U'][tt]*1
+        vels['V'] = file2read.variables['V']
+        vels['V'] = vels['V'][tt]*1
+         
+        tmp1 = np.ones_like(mask[:,:,:,:])
+        tmp1[:,S>S0] = 0
+        
+        tmp = np.ones_like(mask[:,:,:,:])
+        tmp[:,31:,:,:] = 0
+        
+        tmpof = np.zeros_like(mask[:,:,:,:])
+        tmpof[:,rhop(S,T)>rho0] = 1
+        
+        for var in ['Fram','Fram1','Fram2','Denmark','Bering','Davis','Davis1','Davis2','Norwice','Norwice2']:
+            coord = coords[var]
+            coord = coord_calc(coord)
+            # Fram fillign            
+            #vss = (vels[vel[var]][:,coord[0]:coord[1],coord[2]:coord[3]]*\
+            #        Area_y[:,coord[0]:coord[1],coord[2]:coord[3]]/10**6)
+            #if vss.shape[1] > 1:
+            #    vss = np.reshape(vss,(vss.shape[0],vss.shape[1],1))
+            run.fluxes2[var]['Flux'][t,:,:] = (vels[vel[var]][:,coord[0]:coord[1],coord[2]:coord[3]]*\
+                    Area_y[:,coord[0]:coord[1],coord[2]:coord[3]]/10**6)
+            run.fluxes2[var]['FluxSum'][t] = np.nansum(np.nansum(run.fluxes2[var]['Flux'][t,:,:]))
+            run.fluxes2[var]['FluxInSum'][t] = np.nansum(np.nansum(run.fluxes2[var]['Flux'][t,run.fluxes2[var]['Flux'][t,:,:]>0]))
+            run.fluxes2[var]['FluxOutSum'][t] = np.nansum(np.nansum(run.fluxes2[var]['Flux'][t,run.fluxes2[var]['Flux'][t,:,:]<0]))
+            run.fluxes2[var]['FluxT'][t,:,:] = np.tile(run.fluxes2[var]['Flux'][t,:,:]*\
+                                                T[:,coord[0]:coord[1],coord[2]:coord[3]],(1,1,1,1))
+            run.fluxes2[var]['FluxSumT'][t] = np.nansum(np.nansum(run.fluxes2[var]['FluxT'][t,:,:]))
+            run.fluxes2[var]['FluxS'][t,:,:] = run.fluxes2[var]['Flux'][t,:,:]*\
+                                                S[:,coord[0]:coord[1],coord[2]:coord[3]]
+            run.fluxes2[var]['FluxSumS'][t] = np.nansum(np.nansum(run.fluxes2[var]['FluxS'][t,:,:])) 
+            run.fluxes2[var]['FluxFW'][t,:,:] = run.fluxes2[var]['Flux'][t,:,:]*\
+                    (1 - S[:,coord[0]:coord[1],coord[2]:coord[3]]/S0)*tmp[t,:,coord[0]:coord[1],coord[2]:coord[3]]
+            run.fluxes2[var]['FluxSumFW'][t] = np.nansum(np.nansum(run.fluxes2[var]['FluxFW'][t,:,:]))                 
+            run.fluxes2[var]['FluxFW1'][t,:,:] = run.fluxes2[var]['Flux'][t,:,:]*\
+                    (1 - S[:,coord[0]:coord[1],coord[2]:coord[3]]/S0)*tmp1[t,:,coord[0]:coord[1],coord[2]:coord[3]]
+            run.fluxes2[var]['FluxSumFW1'][t] = np.nansum(np.nansum(run.fluxes2[var]['FluxFW1'][t,:,:]))   
+            run.fluxes2[var]['FluxOverFlow'][t,:,:] = run.fluxes2[var]['Flux'][t,:,:]*tmpof[t,:,coord[0]:coord[1],coord[2]:coord[3]]
+            run.fluxes2[var]['FluxSumOverFlow'][t] = np.nansum(np.nansum(run.fluxes2[var]['FluxOverFlow'][t,:,:]))  
+            
+        if tt % 10 == 0:
+            print 'We are at iteration {}'.format(tt)
+            
+    for var in ['Fram','Fram1','Fram2','Denmark','Bering','Davis','Davis1','Davis2','Norwice','Norwice2']:
+        for flux in ['Flux','FluxT','FluxS','FluxFW','FluxFW1','FluxOverFlow']:
+            run.fluxes2[var][flux] = np.squeeze(run.fluxes2[var][flux],axis=ax_d[var])
+            
